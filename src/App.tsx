@@ -151,18 +151,18 @@ function App() {
                         onClear={handleClearForm} 
                     />
 
-                <div className="stats-bar">
-                    <div className="stats">
-                        Total: {prompts.length} | Găsite: {filteredPrompts.length}
+                    <div className="stats-bar">
+                        <div className="stats">
+                            Total: {prompts.length} | Găsite: {filteredPrompts.length}
+                        </div>
                     </div>
-                </div>
 
-                <PromptList 
-                    prompts={filteredPrompts} 
-                    viewMode={viewMode}
-                    onEdit={handleEditPrompt} 
-                    onDelete={handleDeletePrompt} 
-                />
+                    <PromptList 
+                        prompts={filteredPrompts} 
+                        viewMode={viewMode}
+                        onEdit={handleEditPrompt} 
+                        onDelete={handleDeletePrompt} 
+                    />
                 </main>
             </div>
         </div>
