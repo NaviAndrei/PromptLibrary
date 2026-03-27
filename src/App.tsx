@@ -11,22 +11,22 @@ import { Toaster, toast } from 'sonner';
 import { LayoutGrid, List, Moon, Sun } from 'lucide-react';
 
 function App() {
-    // Stocăm array-ul de prompt-uri în localStorage
+    // Store prompts in localStorage
     const [prompts, setPrompts] = useLocalStorage<Prompt[]>('prompts', []);
 
-    // Stocăm workspace-urile în localStorage
+    // Store workspaces in localStorage
     const [workspaces, setWorkspaces] = useLocalStorage<Workspace[]>('workspaces', []);
 
-    // Stocăm istoricul versiunilor în localStorage (indexat după promptId)
+    // Store version history in localStorage (indexed by promptId)
     const [promptHistory, setPromptHistory] = useLocalStorage<PromptVersion[]>('prompt-history', []);
 
-    // Workspace-ul selectat curent (null = toate prompt-urile)
+    // Current selected workspace (null = all prompts)
     const [currentWorkspaceId, setCurrentWorkspaceId] = useState<string | null>(null);
 
-    // Stocăm query-ul de căutare din SearchBar
+    // Store search query from SearchBar
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Stocăm prompt-ul pe care îl edităm în mod curent
+    // Store prompt currently being edited
     const [editingPrompt, setEditingPrompt] = useState<Prompt | null>(null);
 
     // UI state
@@ -34,7 +34,7 @@ function App() {
     const [selectedTag, setSelectedTag] = useState<string | null>(null);
     const [theme, setTheme] = useLocalStorage<'light' | 'dark'>('theme', 'light');
 
-    // Aplică tema globală la nivel de HTML tag
+    // Apply global theme to the HTML tag
     useEffect(() => {
         document.documentElement.setAttribute('data-theme', theme);
     }, [theme]);
@@ -48,21 +48,21 @@ function App() {
         return Object.entries(counts).sort((a, b) => b[1] - a[1]);
     }, [prompts]);
 
-    // Căutare și filtrare (inclusiv după workspace)
+    // Search and filtering (including workspace)
     const filteredPrompts = useMemo(() => {
         let result = prompts;
 
-        // Filtrare după workspace selectat
+        // Filter by selected workspace
         if (currentWorkspaceId) {
             result = result.filter(p => p.workspaceId === currentWorkspaceId);
         }
 
-        // Filtrare după tag selectat
+        // Filter by selected tag
         if (selectedTag) {
             result = result.filter(p => p.tags.includes(selectedTag));
         }
 
-        // Filtrare după textul de căutare
+        // Filter by search text
         if (searchQuery.trim()) {
             const lowerQuery = searchQuery.toLowerCase();
             result = result.filter(p => {
@@ -76,12 +76,12 @@ function App() {
         return result;
     }, [prompts, searchQuery, selectedTag, currentWorkspaceId]);
 
-    // Handler pentru Creare sau Update complet
+    // Handler for Create or Update save
     const handleSavePrompt = (promptData: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt'>) => {
         const now = new Date().toISOString();
 
         if (editingPrompt) {
-            // Capturăm un snapshot al versiunii curente ÎNAINTE de actualizare
+            // Capture a snapshot of the current version BEFORE update
             const snapshot: PromptVersion = {
                 promptId: editingPrompt.id,
                 body: editingPrompt.body,
@@ -89,7 +89,7 @@ function App() {
             };
             setPromptHistory(prev => [snapshot, ...prev]);
 
-            // Actualizăm prompt-ul
+            // Update existing prompt
             const updatedPrompts = prompts.map(p =>
                 p.id === editingPrompt.id
                     ? { ...p, ...promptData, updatedAt: now }
@@ -97,9 +97,9 @@ function App() {
             );
             setPrompts(updatedPrompts);
             setEditingPrompt(null);
-            toast.success('Promptul a fost actualizat cu succes!');
+            toast.success('Prompt updated successfully!');
         } else {
-            // Dacă e nou creat, generăm UUID valid de browser (nativ)
+            // New prompt creation with native UUID
             const newPrompt: Prompt = {
                 ...promptData,
                 id: crypto.randomUUID(),
@@ -108,15 +108,15 @@ function App() {
                 workspaceId: currentWorkspaceId ?? undefined,
             };
             setPrompts([newPrompt, ...prompts]);
-            toast.success('Prompt creat cu succes!');
+            toast.success('Prompt created successfully!');
         }
     };
 
-    // Funcția pentru a procesa importul JSON
+    // Handler to process JSON import
     const handleImportPrompts = (imported: Prompt[]) => {
         setPrompts(imported);
         window.localStorage.setItem('prompts', JSON.stringify(imported));
-        toast.success(`Am importat ${imported.length} prompt-uri!`);
+        toast.success(`Successfully imported ${imported.length} prompts!`);
     };
 
     const handleEditPrompt = (prompt: Prompt) => {
@@ -130,47 +130,46 @@ function App() {
 
     const handleDeletePrompt = (id: string) => {
         setPrompts(prompts.filter(p => p.id !== id));
-        // Ștergem și istoricul versiunilor pentru acest prompt
+        // Clear delete prompt version history
         setPromptHistory(prev => prev.filter(v => v.promptId !== id));
         if (editingPrompt?.id === id) {
             setEditingPrompt(null);
         }
-        toast.info('Promptul a fost șters.');
+        toast.info('Prompt deleted.');
     };
 
-    // Handlers pentru workspace-uri
+    // Workspace handlers
     const handleAddWorkspace = (ws: Workspace) => {
         setWorkspaces(prev => [...prev, ws]);
-        toast.success(`Workspace "${ws.name}" creat!`);
+        toast.success(`Workspace "${ws.name}" created!`);
     };
 
     const handleDeleteWorkspace = (id: string) => {
         setWorkspaces(prev => prev.filter(ws => ws.id !== id));
-        // Dacă workspace-ul șters era selectat, revenim la "Toate"
+        // Reset to "All" if current workspace is deleted
         if (currentWorkspaceId === id) setCurrentWorkspaceId(null);
-        toast.info('Workspace șters.');
+        toast.info('Workspace deleted.');
     };
 
-    // Returnează versiunile pentru un anumit prompt
+    // Get versions for a specific prompt
     const getVersionsForPrompt = (promptId: string): PromptVersion[] => {
         return promptHistory.filter(v => v.promptId === promptId);
     };
 
     return (
-        <div className="container">
+        <div className="container" id="app-root">
             <Toaster position="bottom-right" richColors theme={theme === 'dark' ? 'dark' : 'light'} />
 
             <header className="header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left', flexWrap: 'wrap', gap: '1rem' }}>
                 <div style={{ flex: 1, minWidth: '300px' }}>
                     <h1>Prompt Library</h1>
-                    <p>Gestionează, filtrează și sincronizează prompt-urile AI direct din browser.</p>
+                    <p>Manage, filter, and synchronize your AI prompts directly from your browser.</p>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     <button
-                        className="btn-icon" 
-
+                        className="btn-icon"
                         onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-                        title={theme === 'light' ? 'Treci pe Dark Mode' : 'Treci pe Light Mode'}
+                        title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
                     >
                         {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
                     </button>
@@ -180,7 +179,7 @@ function App() {
 
             <div className="app-layout">
                 <aside className="sidebar">
-                    {/* Workspace Manager deasupra Tags Cloud */}
+                    {/* Workspace Manager above Tags Cloud */}
                     <WorkspaceManager
                         workspaces={workspaces}
                         currentWorkspaceId={currentWorkspaceId}
@@ -230,7 +229,7 @@ function App() {
 
                     <div className="stats-bar">
                         <div className="stats">
-                            Total: {prompts.length} | Găsite: {filteredPrompts.length}
+                            Total: {prompts.length} | Found: {filteredPrompts.length}
                             {currentWorkspaceId && workspaces.find(w => w.id === currentWorkspaceId) && (
                                 <span className="workspace-filter-badge" style={{
                                     marginLeft: '0.5rem',

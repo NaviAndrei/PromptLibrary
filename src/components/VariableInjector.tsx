@@ -3,21 +3,21 @@ import { Copy, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface VariableInjectorProps {
-    body: string; // Corpul prompt-ului care poate conține {{variabile}}
+    body: string; // The prompt body which may contain {{variables}}
 }
 
-// Detectăm toate variabilele unice de tip {{numevariabila}} din text
+// Detect all unique variables of type {{variablename}} from text
 function extractVariables(text: string): string[] {
     const regex = /\{\{(\w+)\}\}/g;
     const matches = new Set<string>();
     let match;
     while ((match = regex.exec(text)) !== null) {
-        matches.add(match[1]); // Adăugăm numele variabilei (fără acolade)
+        matches.add(match[1]); // Add variable name without brackets
     }
     return Array.from(matches);
 }
 
-// Înlocuiește toate aparițiile {{variabila}} cu valoarea corespunzătoare
+// Replace all occurrences of {{variable}} with corresponding value
 function injectVariables(text: string, values: Record<string, string>): string {
     return text.replace(/\{\{(\w+)\}\}/g, (_, name) => values[name] || `{{${name}}}`);
 }
@@ -26,29 +26,29 @@ export function VariableInjector({ body }: VariableInjectorProps) {
     const variables = useMemo(() => extractVariables(body), [body]);
     const [values, setValues] = useState<Record<string, string>>({});
 
-    // Nu afișăm nimic dacă nu există variabile în prompt
+    // Render nothing if no variables are detected
     if (variables.length === 0) return null;
 
-    // Handler pentru actualizarea valorii unei variabile
+    // Handler for updating a variable's value
     const handleChange = (name: string, value: string) => {
         setValues(prev => ({ ...prev, [name]: value }));
     };
 
-    // Copiază prompt-ul cu variabilele injectate în clipboard
+    // Copy prompt with injected variables to clipboard
     const handleCopy = () => {
         const injected = injectVariables(body, values);
         navigator.clipboard.writeText(injected);
-        toast.success('Prompt copiat cu variabilele completate!');
+        toast.success('Prompt copied with variables injected!');
     };
 
     return (
-        <div className="variable-injector">
+        <div className="variable-injector" id="variable-injector">
             <div className="variable-injector-header">
                 <Zap size={14} />
-                <span>Variabile detectate – completează înainte de a copia</span>
+                <span>Detected Variables – fill them before copying</span>
             </div>
 
-            {/* Câte un input pentru fiecare variabilă unică detectată */}
+            {/* Render input for each detected variable */}
             <div className="variable-inputs-grid">
                 {variables.map(varName => (
                     <div key={varName} className="variable-input-group">
@@ -58,7 +58,7 @@ export function VariableInjector({ body }: VariableInjectorProps) {
                         <input
                             type="text"
                             className="variable-input"
-                            placeholder={`Valoare pentru ${varName}`}
+                            placeholder={`Value for ${varName}`}
                             value={values[varName] || ''}
                             onChange={e => handleChange(varName, e.target.value)}
                         />
@@ -66,9 +66,9 @@ export function VariableInjector({ body }: VariableInjectorProps) {
                 ))}
             </div>
 
-            {/* Buton de copiere cu variabilele injectate */}
+            {/* Button to copy with values injected */}
             <button className="btn-primary variable-copy-btn" onClick={handleCopy}>
-                <Copy size={14} /> Copiază cu variabilele completate
+                <Copy size={14} /> Copy with variables filled
             </button>
         </div>
     );

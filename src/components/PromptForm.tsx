@@ -10,14 +10,14 @@ interface PromptFormProps {
     currentWorkspaceId: string | null;
 }
 
-// Formarul pentru crearea sau editarea unui prompt
+// Form for creating or editing a prompt
 export function PromptForm({ onSave, editingPrompt, existingTags, onClear, workspaces, currentWorkspaceId }: PromptFormProps) {
-    // Inițializăm state-ul din prima cu valorile dorite (se va re-rula datorită prop-ului 'key' din App.tsx)
+    // Initial state set based on editingPrompt or defaults
     const [title, setTitle] = useState(editingPrompt?.title || '');
     const [body, setBody] = useState(editingPrompt?.body || '');
     const [tagsInput, setTagsInput] = useState(editingPrompt ? editingPrompt.tags.join(', ') : '');
     const [model, setModel] = useState(editingPrompt?.model || 'GPT-4o');
-    // Workspace-ul selectat în formular (implicit cel curent sau cel de pe prompt în editare)
+    // Selected workspace in the form (defaults to current or prompt's workspace)
     const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(
         editingPrompt?.workspaceId ?? currentWorkspaceId ?? ''
     );
@@ -33,19 +33,19 @@ export function PromptForm({ onSave, editingPrompt, existingTags, onClear, works
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validări de bază (trim elimină spațiile goale exterioare)
+        // Basic validation
         if (!title.trim() || !body.trim()) {
-            alert('Titlul și corpul textului sunt necesare.');
+            alert('Title and prompt body are required.');
             return;
         }
 
-        // Parsăm tag-urile dintr-un string separat prin virgulă într-un array
+        // Parse tags from comma-separated string to array
         const tagsArray = tagsInput
             .split(',')
             .map(t => t.trim())
             .filter(t => t.length > 0);
 
-        // Apelăm funcția callback trimisă ca prop (din App.tsx) cu datele curate
+        // Call callback from App.tsx with clean data
         onSave({
             title: title.trim(),
             body: body.trim(),
@@ -54,40 +54,40 @@ export function PromptForm({ onSave, editingPrompt, existingTags, onClear, works
             workspaceId: selectedWorkspaceId || undefined,
         });
 
-        // Curățăm formularul nativ doar dacă este o creare (nu o editare)
+        // Clear form only on creation (not on edit)
         if (!editingPrompt) {
             resetForm();
         }
     };
 
     return (
-        <form className="prompt-form card" onSubmit={handleSubmit}>
-            <h3>{editingPrompt ? 'Editează Prompt' : 'Adaugă Prompt Nou'}</h3>
+        <form className="prompt-form card" onSubmit={handleSubmit} id="prompt-form">
+            <h3>{editingPrompt ? 'Edit Prompt' : 'Add New Prompt'}</h3>
 
             <div className="form-group">
-                <label>Titlu:</label>
+                <label>Title:</label>
                 <input
                     type="text"
                     value={title}
                     onChange={e => setTitle(e.target.value)}
-                    placeholder="Ex: Refactorizare cod Python"
+                    placeholder="e.g., Python Code Refactor"
                 />
             </div>
 
             <div className="form-group row-group">
                 <div className="flex-1">
-                    <label>Tag-uri (separate prin virgulă):</label>
+                    <label>Tags (comma separated):</label>
                     <input
                         type="text"
                         value={tagsInput}
                         onChange={e => setTagsInput(e.target.value)}
-                        placeholder="Ex: refactor, python, clean-code"
+                        placeholder="e.g., refactor, python, clean-code"
                         list="tags-autocomplete"
                         autoComplete="off"
                     />
                     <datalist id="tags-autocomplete">
                         {(() => {
-                            // Logica pentru autocomplete multi-tag folosind datalist nativ
+                            // Multi-tag autocomplete logic using native datalist
                             const parts = tagsInput.split(',');
                             const lastPart = parts[parts.length - 1].trim();
                             const prefix = parts.length > 1
@@ -107,17 +107,17 @@ export function PromptForm({ onSave, editingPrompt, existingTags, onClear, works
                     </datalist>
                 </div>
                 <div className="flex-1">
-                    <label>Model recomandat:</label>
+                    <label>Recommended Model:</label>
                     <input
                         type="text"
                         value={model}
                         onChange={e => setModel(e.target.value)}
-                        placeholder="Ex: Claude 3.5 Sonnet"
+                        placeholder="e.g., Claude 3.5 Sonnet"
                     />
                 </div>
             </div>
 
-            {/* Selector Workspace – apare doar dacă există workspace-uri create */}
+            {/* Workspace Selector - visible if workspaces exist */}
             {workspaces.length > 0 && (
                 <div className="form-group">
                     <label>Workspace:</label>
@@ -126,7 +126,7 @@ export function PromptForm({ onSave, editingPrompt, existingTags, onClear, works
                         onChange={e => setSelectedWorkspaceId(e.target.value)}
                         className="workspace-select"
                     >
-                        <option value="">— Fără workspace (general) —</option>
+                        <option value="">— No workspace (General) —</option>
                         {workspaces.map(ws => (
                             <option key={ws.id} value={ws.id}>
                                 {ws.icon} {ws.name}
@@ -137,21 +137,21 @@ export function PromptForm({ onSave, editingPrompt, existingTags, onClear, works
             )}
 
             <div className="form-group">
-                <label>Corpul textului (Prompt):</label>
+                <label>Prompt Body:</label>
                 <textarea
                     value={body}
                     onChange={e => setBody(e.target.value)}
                     rows={6}
-                    placeholder="Scrie corpul prompt-ului tău aici... Poți folosi {{variabile}} pentru injectare dinamică."
+                    placeholder="Write your prompt body here... Use {{variable}} for dynamic injection."
                 />
             </div>
 
             <div className="form-actions">
                 <button type="submit" className="btn-primary">
-                    {editingPrompt ? 'Actualizează' : 'Adaugă'}
+                    {editingPrompt ? 'Update Prompt' : 'Add Prompt'}
                 </button>
                 <button type="button" onClick={onClear} className="btn-secondary">
-                    Curăță / Anulează
+                    Clear / Cancel
                 </button>
             </div>
         </form>

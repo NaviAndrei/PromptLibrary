@@ -18,22 +18,22 @@ interface PromptListProps {
     workspaces: Workspace[];
 }
 
-// Renderizează lista de prompt-uri și acțiunile asociate fiecăruia
+// Renders the list of prompts and associated actions
 export function PromptList({ prompts, viewMode, onEdit, onDelete, getVersions, workspaces }: PromptListProps) {
-    // Păstrăm local un array cu ID-urile prompturilor extinse (pentru afișarea conținutului complet)
+    // Local state for expanded prompt IDs (vertical expansion)
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
-    // ID-ul prompt-ului pentru care se afișează panoul de Version History
+    // State for which prompt's history is being viewed
     const [historyPromptId, setHistoryPromptId] = useState<string | null>(null);
 
-    // Funcție pentru a copia în clipboard body-ul
+    // Copy to clipboard handler
     const handleCopy = async (text: string) => {
         try {
             await navigator.clipboard.writeText(text);
-            toast.success('Promptul a fost copiat în clipboard!');
+            toast.success('Prompt copied to clipboard!');
         } catch (err) {
-            console.error('Eroare la copiere:', err);
-            toast.error('Copierea a eșuat.');
+            console.error('Copy failure:', err);
+            toast.error('Copy failed.');
         }
     };
 
@@ -48,7 +48,7 @@ export function PromptList({ prompts, viewMode, onEdit, onDelete, getVersions, w
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        toast.success(`Exportat: ${prompt.title}.md`);
+        toast.success(`Exported: ${prompt.title}.md`);
     };
 
     const toggleExpand = (id: string) => {
@@ -64,22 +64,22 @@ export function PromptList({ prompts, viewMode, onEdit, onDelete, getVersions, w
     if (prompts.length === 0) {
         return (
             <div className="empty-state">
-                <p>Nu s-a găsit niciun prompt valid. Adaugă unul nou sau modifică filtrele!</p>
+                <p>No valid prompts found. Add a new one or clear filters!</p>
             </div>
         );
     }
 
-    // Prompt-ul selectat pentru vizualizare istorică
+    // Selected prompt for history view
     const historyPrompt = historyPromptId ? prompts.find(p => p.id === historyPromptId) : null;
 
     return (
         <>
-            {/* Modal pentru Version History (se randează deasupra listei) */}
+            {/* Version History Modal */}
             {historyPrompt && (
                 <VersionHistory
                     promptTitle={historyPrompt.title}
                     versions={[
-                        // Includem versiunea curentă ca ultim snapshot pentru context
+                        // Include current version as latest snapshot
                         { promptId: historyPrompt.id, body: historyPrompt.body, savedAt: historyPrompt.updatedAt },
                         ...getVersions(historyPrompt.id),
                     ]}
@@ -87,10 +87,10 @@ export function PromptList({ prompts, viewMode, onEdit, onDelete, getVersions, w
                 />
             )}
 
-            <div className={`prompt-list ${viewMode}`}>
+            <div className={`prompt-list ${viewMode}`} id="prompt-list">
                 {prompts.map(prompt => {
                     const isExpanded = expandedIds.has(prompt.id);
-                    // Găsim workspace-ul asociat prompt-ului (dacă există)
+                    // Find workspace associated with the prompt
                     const promptWorkspace = workspaces.find(w => w.id === prompt.workspaceId);
 
                     return (
@@ -99,7 +99,7 @@ export function PromptList({ prompts, viewMode, onEdit, onDelete, getVersions, w
                                 <div>
                                     <h4>
                                         {prompt.title}
-                                        {/* Badge colorat pentru workspace */}
+                                        {/* Workspace badge */}
                                         {promptWorkspace && (
                                             <span
                                                 className="workspace-chip"
@@ -113,27 +113,27 @@ export function PromptList({ prompts, viewMode, onEdit, onDelete, getVersions, w
                                     <span className="model-badge">{prompt.model}</span>
                                 </div>
                                 <div className="prompt-actions">
-                                    <button onClick={() => onEdit(prompt)} className="btn-icon" title="Editează">
+                                    <button onClick={() => onEdit(prompt)} className="btn-icon" title="Edit">
                                         <Edit2 size={16} />
                                     </button>
-                                    <button onClick={() => handleCopy(prompt.body)} className="btn-icon" title="Copiază">
+                                    <button onClick={() => handleCopy(prompt.body)} className="btn-icon" title="Copy">
                                         <Copy size={16} />
                                     </button>
-                                    <button onClick={() => handleExportMD(prompt)} className="btn-icon" title="Export ca Markdown">
+                                    <button onClick={() => handleExportMD(prompt)} className="btn-icon" title="Export as Markdown">
                                         <Download size={16} />
                                     </button>
-                                    {/* Buton nou: afișare Version History */}
+                                    {/* Version History button */}
                                     <button
                                         onClick={() => setHistoryPromptId(prompt.id)}
                                         className="btn-icon"
-                                        title="Istoricul versiunilor"
+                                        title="Version History"
                                     >
                                         <Clock size={16} />
                                     </button>
                                     <button
-                                        onClick={() => window.confirm('Ești sigur că vrei să ștergi?') && onDelete(prompt.id)}
+                                        onClick={() => window.confirm('Are you sure you want to delete this prompt?') && onDelete(prompt.id)}
                                         className="btn-icon delete"
-                                        title="Șterge"
+                                        title="Delete"
                                     >
                                         <Trash2 size={16} />
                                     </button>
@@ -182,7 +182,7 @@ export function PromptList({ prompts, viewMode, onEdit, onDelete, getVersions, w
                                                 {prompt.body}
                                             </ReactMarkdown>
                                         </div>
-                                        {/* VariableInjector apare doar când prompt-ul e extins și conține {{variabile}} */}
+                                        {/* VariableInjector - visible only when expanded and tags present */}
                                         <VariableInjector body={prompt.body} />
                                     </>
                                 ) : (
@@ -194,9 +194,9 @@ export function PromptList({ prompts, viewMode, onEdit, onDelete, getVersions, w
                                 {prompt.body.length > 100 && (
                                     <button className="expand-btn" onClick={() => toggleExpand(prompt.id)}>
                                         {isExpanded ? (
-                                            <><ChevronUp size={16} /> Restrânge</>
+                                            <><ChevronUp size={16} /> Collapse</>
                                         ) : (
-                                            <><ChevronDown size={16} /> Extinde</>
+                                            <><ChevronDown size={16} /> Expand</>
                                         )}
                                     </button>
                                 )}

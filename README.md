@@ -1,83 +1,61 @@
-# 📝 Prompt Library
+# 🚀 Prompt Library
 
-A sleek, production-quality web application designed to help AI enthusiasts and developers manage their collection of LLM prompts. Built with **React**, **TypeScript**, and **Vite**, it features full CRUD functionality with zero backend dependencies.
+A professional, local-first **AI Prompt Management System** built for speed, organization, and portability.
 
----
+[![Deployment Status](https://github.com/NaviAndrei/PromptLibrary/actions/workflows/deploy.yml/badge.svg)](https://github.com/NaviAndrei/PromptLibrary/actions/workflows/deploy.yml)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](package.json)
 
 ## ✨ Features
 
-- **🚀 PWA Support**: Work offline and install as a native app on mobile or desktop.
-- **☁️ Cloud Sync**: Securely sync your prompts using GitHub Gists (No database needed!).
-- **📑 Rich Formatting**: Markdown support with syntax highlighting for code blocks.
-- **🔍 Advanced Search**: Instant filtering by title, body, or tags.
-- **🏷️ Smart Tags**: Interactive sidebar to organize your library and intelligent autocomplete when adding new prompts.
-- **💾 Data Control**: Export/Import your entire library as JSON or individual prompts as Markdown.
-- **📊 Token Estimator**: Real-time token count estimation for each prompt.
-- **🛡️ Secure & Private**: All data stays in your browser or your private GitHub Gist.
-- **🌓 Modern UI**: Responsive design with Grid (Masonry) and List view modes.
+- **📂 Smart Workspaces**: Organize prompts into dedicated project folders with custom icons and colors.
+- **🌗 Dark Mode**: Premium dark/light themes that persist across sessions.
+- **🧩 Variable Injection**: Use `{{variable}}` syntax to create dynamic templates with live input fields.
+- **🕐 Version History**: Automatic snapshots of your prompts with a built-in visual code diff (LCS algorithm).
+- **☁️ Cloud Sync**: Bidirectional synchronization using GitHub Gists (Secret) – keeps your data private and mobile.
+- **📱 PWA Ready**: Install it as a desktop or mobile app for offline access.
+- **🏷️ Multi-Tag Autocomplete**: Smart tag suggestions even for multiple tag entries.
+- **🚀 Masonry Grid**: Optimized layout for wide screens (3+ columns).
 
-## 🛠️ Technology Stack
+## 🛠️ Tech Stack
 
-- **React 19** & **TypeScript**
-- **Vite** (Build Tool & PWA)
-- **Lucide React** (Icons)
-- **Sonner** (Toast Notifications)
-- **Markdown** (remark-gfm, react-syntax-highlighter)
-- **GitHub Actions** (CI/CD)
-- **GitHub Pages** (Hosting)
-
-## 📋 Changelog
-
-Detailed changes for each release can be found in the [CHANGELOG.md](./CHANGELOG.md) file.
+- **Core**: React 18 + TypeScript + Vite
+- **Styling**: Vanilla CSS (CSS Variables)
+- **Icons**: Lucide React
+- **Storage**: LocalStorage + GitHub Gist API
+- **Formatting**: React Markdown + Syntax Highlighting (Prism)
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or newer)
-- npm (comes with Node.js)
-
-### Installation
-1. Clone the repository:
+1. **Clone the repository**:
    ```bash
    git clone https://github.com/NaviAndrei/PromptLibrary.git
-   ```
-2. Navigate to the project directory:
-   ```bash
    cd PromptLibrary
    ```
-3. Install dependencies:
+
+2. **Install dependencies**:
    ```bash
    npm install
    ```
 
-### Development
-Start the development server:
-```bash
-npm run dev
-```
+3. **Run in development mode**:
+   ```bash
+   npm run dev
+   ```
 
-### Build
-Build the project for production:
-```bash
-npm run build
-```
+4. **Build for production**:
+   ```bash
+   npm run build
+   ```
 
-### 🗺️ Roadmap
+## 🌐 Deployment
 
-- [x] PWA Support & Offline Mode
-- [x] JSON Import/Export & Markdown Export
-- [x] GitHub Gist Cloud Sync
-- [x] Markdown Rendering & Syntax Highlighting
-- [x] Smart Tag Autocomplete
-- [ ] Dark Mode Toggle
-- [ ] Multiple Gist support for shared libraries
-- [ ] Advanced prompt templates with input variables
+The project is automatically deployed to **GitHub Pages** via GitHub Actions on every push to the `main` branch.
 
-## 📄 License
+**Live Demo**: [https://naviandrei.github.io/PromptLibrary/](https://naviandrei.github.io/PromptLibrary/)
 
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+## 📝 License
 
-Copyright (c) 2026 **Ivan Andrei (NaviAndrei)**
+Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
-*Developed with ❤️ as a modern prompt management solution.*
+Built with ❤️ by **NaviAndrei**

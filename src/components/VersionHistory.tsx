@@ -8,8 +8,8 @@ interface VersionHistoryProps {
 }
 
 // ========================
-// Algoritm LCS (Longest Common Subsequence) pentru diff vizual nativ
-// Returnează un array de operații: 'equal' | 'added' | 'removed'
+// LCS (Longest Common Subsequence) Algorithm for native visual diff
+// Returns an array of operations: 'equal' | 'added' | 'removed'
 // ========================
 interface DiffPart {
     text: string;
@@ -23,7 +23,7 @@ function computeDiff(oldText: string, newText: string): DiffPart[] {
     const m = oldLines.length;
     const n = newLines.length;
 
-    // Construim matricea LCS
+    // Build LCS matrix
     const dp: number[][] = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
 
     for (let i = 1; i <= m; i++) {
@@ -36,7 +36,7 @@ function computeDiff(oldText: string, newText: string): DiffPart[] {
         }
     }
 
-    // Reconstruim diff-ul urmând calea prin matricea LCS
+    // Reconstruct diff by backtracking through the LCS matrix
     const parts: DiffPart[] = [];
     let i = m;
     let j = n;
@@ -58,7 +58,7 @@ function computeDiff(oldText: string, newText: string): DiffPart[] {
     return parts;
 }
 
-// Sub-componentă pentru afișarea unui diff între două versiuni
+// Sub-component for displaying a diff between two versions
 function DiffView({ oldBody, newBody }: { oldBody: string; newBody: string }) {
     const parts = computeDiff(oldBody, newBody);
 
@@ -76,26 +76,26 @@ function DiffView({ oldBody, newBody }: { oldBody: string; newBody: string }) {
     );
 }
 
-// Formatează data ISO într-un string human-readable românesc
+// Formats ISO date into a human-readable string (EN locale)
 function formatDate(iso: string): string {
-    return new Date(iso).toLocaleString('ro-RO', {
+    return new Date(iso).toLocaleString('en-US', {
         day: '2-digit', month: 'short', year: 'numeric',
         hour: '2-digit', minute: '2-digit',
     });
 }
 
 export function VersionHistory({ promptTitle, versions, onClose }: VersionHistoryProps) {
-    // Versiunile sortate de la cea mai nouă la cea mai veche
+    // Sort versions from newest to oldest
     const sorted = [...versions].sort(
         (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime()
     );
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay" onClick={onClose} id="history-modal">
             <div className="modal-content version-history-modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
                     <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <Clock size={18} /> Istoricul versiunilor
+                        <Clock size={18} /> Version History
                     </h3>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                         <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{promptTitle}</span>
@@ -104,16 +104,16 @@ export function VersionHistory({ promptTitle, versions, onClose }: VersionHistor
                 </div>
 
                 {sorted.length < 2 ? (
-                    // Nu există suficiente versiuni pentru a afișa un diff
+                    // Not enough versions to show a diff
                     <div className="empty-state" style={{ padding: '2rem' }}>
                         <Clock size={32} style={{ marginBottom: '0.5rem', opacity: 0.5 }} />
-                        <p>Nu există versiuni anterioare salvate.</p>
+                        <p>No previous versions saved yet.</p>
                         <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
-                            Editează și salvează acest prompt pentru a crea primul snapshot.
+                            Edit and save this prompt to create your first snapshot.
                         </p>
                     </div>
                 ) : (
-                    // Afișăm câte un diff între fiecare versiune consecutivă
+                    // Show diffs between consecutive versions
                     <div className="version-list">
                         {sorted.slice(0, -1).map((version, idx) => (
                             <div key={version.savedAt} className="version-entry">

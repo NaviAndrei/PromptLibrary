@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import type { Workspace } from '../types';
-import { FolderOpen, Plus, Trash2, Check } from 'lucide-react';
+import { FolderOpen, Plus, Trash2, Check, X } from 'lucide-react';
 
-// Culori predefinite pentru workspace-uri noi
+// Preset colors for new workspaces
 const PRESET_COLORS = [
     '#3b82f6', '#10b981', '#f59e0b', '#ef4444',
     '#8b5cf6', '#06b6d4', '#f97316', '#ec4899',
 ];
 
-// Emoji-uri predefinite pentru workspace-uri
+// Preset emojis for workspaces
 const PRESET_ICONS = ['💼', '🚀', '🎨', '📚', '🔧', '🌟', '🎯', '🧠'];
 
 interface WorkspaceManagerProps {
@@ -26,13 +26,13 @@ export function WorkspaceManager({
     onAdd,
     onDelete,
 }: WorkspaceManagerProps) {
-    // State-ul formularului pentru creare workspace nou
+    // Form state for creating new workspace
     const [isAdding, setIsAdding] = useState(false);
     const [newName, setNewName] = useState('');
     const [newIcon, setNewIcon] = useState('💼');
     const [newColor, setNewColor] = useState(PRESET_COLORS[0]);
 
-    // Handler pentru confirmare creare workspace
+    // Handler for confirming workspace creation
     const handleAdd = () => {
         if (!newName.trim()) return;
         const ws: Workspace = {
@@ -43,7 +43,7 @@ export function WorkspaceManager({
             createdAt: new Date().toISOString(),
         };
         onAdd(ws);
-        // Resetăm formularul
+        // Reset form
         setNewName('');
         setNewIcon('💼');
         setNewColor(PRESET_COLORS[0]);
@@ -54,30 +54,30 @@ export function WorkspaceManager({
         <div className="workspace-manager">
             <div className="workspace-header">
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, fontSize: '0.95rem' }}>
-                    <FolderOpen size={16} /> Workspace-uri
+                    <FolderOpen size={16} /> Workspaces
                 </span>
                 <button
                     className="btn-icon"
                     onClick={() => setIsAdding(!isAdding)}
-                    title="Adaugă workspace nou"
+                    title={isAdding ? 'Cancel' : 'Add new workspace'}
                 >
-                    <Plus size={16} />
+                    {isAdding ? <X size={16} /> : <Plus size={16} />}
                 </button>
             </div>
 
-            {/* Formularul de creare workspace */}
+            {/* Workspace creation form */}
             {isAdding && (
-                <div className="workspace-add-form">
+                <div className="workspace-add-form" id="workspace-add-form">
                     <input
                         type="text"
                         value={newName}
                         onChange={e => setNewName(e.target.value)}
-                        placeholder="Numele workspace-ului"
+                        placeholder="Workspace name"
                         className="workspace-name-input"
                         onKeyDown={e => e.key === 'Enter' && handleAdd()}
                         autoFocus
                     />
-                    {/* Selector emoji */}
+                    {/* Emoji selector */}
                     <div className="workspace-icons-grid">
                         {PRESET_ICONS.map(icon => (
                             <button
@@ -89,7 +89,7 @@ export function WorkspaceManager({
                             </button>
                         ))}
                     </div>
-                    {/* Selector culoare */}
+                    {/* Color selector */}
                     <div className="workspace-colors-grid">
                         {PRESET_COLORS.map(color => (
                             <button
@@ -101,20 +101,20 @@ export function WorkspaceManager({
                         ))}
                     </div>
                     <button className="btn-primary" style={{ width: '100%', marginTop: '0.5rem' }} onClick={handleAdd}>
-                        <Check size={14} /> Creează
+                        <Check size={14} /> Create
                     </button>
                 </div>
             )}
 
-            {/* Lista workspace-urilor existente */}
-            <ul className="workspace-list">
-                {/* Opțiunea "Toate" */}
+            {/* List of existing workspaces */}
+            <ul className="workspace-list" id="workspace-list">
+                {/* "All" option */}
                 <li
                     className={`workspace-item ${currentWorkspaceId === null ? 'active' : ''}`}
                     onClick={() => onSelect(null)}
                 >
                     <span>🗂️</span>
-                    <span className="workspace-item-name">Toate</span>
+                    <span className="workspace-item-name">All Prompts</span>
                 </li>
 
                 {workspaces.map(ws => (
@@ -128,8 +128,8 @@ export function WorkspaceManager({
                         <span className="workspace-item-name">{ws.name}</span>
                         <button
                             className="btn-icon workspace-delete-btn"
-                            onClick={e => { e.stopPropagation(); onDelete(ws.id); }}
-                            title="Șterge workspace"
+                            onClick={e => { e.stopPropagation(); window.confirm(`Delete workspace "${ws.name}"?`) && onDelete(ws.id); }}
+                            title="Delete workspace"
                         >
                             <Trash2 size={12} />
                         </button>

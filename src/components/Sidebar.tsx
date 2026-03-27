@@ -6,17 +6,17 @@ interface SidebarProps {
     onSelectTag: (tag: string | null) => void;
 }
 
-// Sidebar afișează doar Tags Cloud - WorkspaceManager e rendat separat în App.tsx
+// Sidebar displays only Tags Cloud - WorkspaceManager is rendered separately in App.tsx
 export function Sidebar({ tags, selectedTag, onSelectTag }: SidebarProps) {
     return (
-        <div className="sidebar-tags-section">
+        <div className="sidebar-tags-section" id="sidebar-tags">
             <div className="sidebar-header">
                 <h3><Tag size={18} /> Tags Cloud</h3>
             </div>
 
             {tags.length === 0 ? (
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', padding: '0.5rem 0' }}>
-                    Niciun tag disponibil.
+                    No tags available.
                 </p>
             ) : (
                 <ul className="tags-list">
@@ -24,7 +24,7 @@ export function Sidebar({ tags, selectedTag, onSelectTag }: SidebarProps) {
                         className={selectedTag === null ? 'active' : ''}
                         onClick={() => onSelectTag(null)}
                     >
-                        Toate
+                        All
                     </li>
                     {tags.map(([tag, count]) => (
                         <li
