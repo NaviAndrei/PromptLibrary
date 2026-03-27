@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { Prompt } from './types';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { SearchBar } from './components/SearchBar';
@@ -7,7 +7,7 @@ import { PromptList } from './components/PromptList';
 import { Sidebar } from './components/Sidebar';
 import { DataActions } from './components/DataActions';
 import { Toaster, toast } from 'sonner';
-import { LayoutGrid, List } from 'lucide-react';
+import { LayoutGrid, List, Moon, Sun } from 'lucide-react';
 
 function App() {
     // Stocăm array-ul de prompt-uri în localStorage
@@ -23,6 +23,12 @@ function App() {
     // UI state
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
     const [selectedTag, setSelectedTag] = useState<string | null>(null);
+    const [theme, setTheme] = useLocalStorage<'light' | 'dark'>('theme', 'light');
+
+    // Aplică tema globală la nivel de HTML tag
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+    }, [theme]);
 
     // Compute all unique tags for the sidebar
     const allTags = useMemo(() => {
@@ -113,14 +119,23 @@ function App() {
 
     return (
         <div className="container">
-            <Toaster position="bottom-right" richColors />
+            <Toaster position="bottom-right" richColors theme={theme === 'dark' ? 'dark' : 'light'} />
             
             <header className="header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left', flexWrap: 'wrap', gap: '1rem' }}>
                 <div style={{ flex: 1, minWidth: '300px' }}>
                     <h1>Prompt Library</h1>
                     <p>Gestionează, filtrează și sincronizează prompt-urile AI direct din browser.</p>
                 </div>
-                <DataActions prompts={prompts} onImport={handleImportPrompts} />
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <button 
+                        className="btn-icon" 
+                        onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                        title={theme === 'light' ? 'Treci pe Dark Mode' : 'Treci pe Light Mode'}
+                    >
+                        {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                    </button>
+                    <DataActions prompts={prompts} onImport={handleImportPrompts} />
+                </div>
             </header>
 
             <div className="app-layout">

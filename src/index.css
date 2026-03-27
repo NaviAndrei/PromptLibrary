@@ -1,6 +1,6 @@
 /* CSS Modern și Minimal pentru Prompt Library */
 
-:root {
+:root, [data-theme="light"] {
   /* Paleta de culori Light-Premium */
   --bg-color: #f8fafc;
   --surface-color: #ffffff;
@@ -16,16 +16,36 @@
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
+}
 
+[data-theme="dark"] {
+  /* Paleta de culori Dark-Premium */
+  --bg-color: #0f172a;
+  --surface-color: #1e293b;
+  --primary-color: #3b82f6;
+  --primary-hover: #60a5fa;
+  --text-dark: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #334155;
+  --danger-color: #ef4444;
+  --danger-hover: #f87171;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+}
+
+body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   color: var(--text-dark);
   background-color: var(--bg-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 
 /* Reset de bază */
 * {
@@ -34,9 +54,9 @@
   padding: 0;
 }
 
-/* Container principal ajustat pe centru cu 900px lățime max */
+/* Container principal ajustat pe centru cu 1400px lățime max pentru a permite view de grid generos (3+ coloane) pe monitoare mari */
 .container {
-  max-width: 900px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 2rem 1rem;
 }
@@ -189,12 +209,13 @@ button {
 }
 
 .btn-secondary {
-  background-color: #f1f5f9;
+  background-color: var(--bg-color);
   color: var(--text-dark);
+  border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover {
-  background-color: #e2e8f0;
+  background-color: var(--border-color);
 }
 
 .btn-icon {
@@ -204,13 +225,13 @@ button {
 }
 
 .btn-icon:hover {
-  background-color: #f1f5f9;
+  background-color: var(--bg-color);
   color: var(--text-dark);
 }
 
 .btn-icon.delete:hover {
   color: var(--danger-color);
-  background-color: #fef2f2;
+  background-color: var(--bg-color);
 }
 
 /* Statisticile listei */
@@ -236,7 +257,7 @@ button {
 }
 
 .view-toggle .btn-icon.active {
-  background: #e2e8f0;
+  background: var(--border-color);
   color: var(--primary-color);
 }
 
@@ -296,7 +317,7 @@ button {
 }
 
 .tags-list li:hover {
-  background: #f1f5f9;
+  background: var(--bg-color);
   color: var(--text-dark);
 }
 
@@ -313,7 +334,7 @@ button {
 .tag-name { font-weight: 500; }
 .tag-count {
   font-size: 0.75rem;
-  background: #e2e8f0;
+  background: var(--border-color);
   padding: 2px 6px;
   border-radius: 99px;
   color: var(--text-muted);
@@ -331,12 +352,27 @@ button {
 
 /* Lista și Elementele Prompt */
 .prompt-list.grid {
-  columns: 1 20rem; /* Native CSS Masonry */
-  gap: 1.5rem;
+  column-count: 3; /* Forțăm browser-ul să folosească 3 coloane pe rezoluții mari */
+  column-gap: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+  .prompt-list.grid {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .prompt-list.grid {
+    column-count: 1;
+  }
 }
 
 .prompt-list.grid > .prompt-card {
   break-inside: avoid-column;
+  page-break-inside: avoid;
+  display: inline-block;
+  width: 100%;
   margin-bottom: 1.5rem;
 }
 
@@ -367,8 +403,8 @@ button {
 .model-badge {
   display: inline-block;
   font-size: 0.75rem;
-  background-color: #e0e7ff;
-  color: #4338ca;
+  background-color: var(--border-color);
+  color: var(--primary-color);
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
   font-weight: 600;
@@ -384,7 +420,7 @@ button {
 
 .tag-badge {
   font-size: 0.8rem;
-  background-color: #f1f5f9;
+  background-color: var(--bg-color);
   color: var(--text-dark);
   padding: 0.2rem 0.6rem;
   border-radius: 4px;
@@ -392,8 +428,8 @@ button {
 
 .token-badge {
   font-size: 0.75rem;
-  background-color: #fef08a;
-  color: #854d0e;
+  background-color: var(--danger-color);
+  color: white;
   padding: 0.2rem 0.6rem;
   border-radius: 4px;
   font-weight: 500;
@@ -402,7 +438,7 @@ button {
 /* Zona expandabilă de conținut textual (body) */
 .prompt-body-preview {
   margin-top: 1rem;
-  background-color: #f8fafc;
+  background-color: var(--bg-color);
   padding: 1rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
@@ -491,14 +527,14 @@ button {
   width: 100%;
   margin-top: 1rem;
   padding: 0.5rem;
-  background: #f1f5f9;
+  background: var(--bg-color);
   color: var(--text-muted);
   border-radius: var(--radius-md);
   transition: all 0.2s;
 }
 
 .expand-btn:hover {
-  background: #e2e8f0;
+  background: var(--border-color);
   color: var(--text-dark);
 }
 
@@ -529,7 +565,7 @@ button {
   margin-bottom: 1rem;
 }
 .markdown-body code {
-  background: #f1f5f9;
+  background: var(--border-color);
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
   font-family: 'Consolas', monospace;
