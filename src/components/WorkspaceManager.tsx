@@ -128,7 +128,12 @@ export function WorkspaceManager({
                         <span className="workspace-item-name">{ws.name}</span>
                         <button
                             className="btn-icon workspace-delete-btn"
-                            onClick={e => { e.stopPropagation(); window.confirm(`Delete workspace "${ws.name}"?`) && onDelete(ws.id); }}
+                            onClick={e => { 
+                                e.stopPropagation(); 
+                                if (window.confirm(`Delete workspace "${ws.name}"?`)) {
+                                    onDelete(ws.id);
+                                }
+                            }}
                             title="Delete workspace"
                         >
                             <Trash2 size={12} />
