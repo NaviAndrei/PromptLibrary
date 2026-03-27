@@ -38,19 +38,28 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
 
         const reader = new FileReader();
         reader.onload = (event) => {
+            console.log('FileReader onload triggered');
             try {
-                const parsed = JSON.parse(event.target?.result as string);
+                const result = event.target?.result as string;
+                console.log('File read result length:', result?.length);
+                const parsed = JSON.parse(result);
+                console.log('JSON parsed, isArray:', Array.isArray(parsed));
+                
                 if (Array.isArray(parsed) && parsed.every(p => p.title && p.body && p.id)) {
-                    // Dacă vrem să suprascriem sau să facem append, acum facem simplu overwrite:
-                    if (window.confirm(`Gata de a suprascrie baza de date cu ${parsed.length} prompt-uri?`)) {
-                        onImport(parsed);
-                        toast.success(`${parsed.length} prompt-uri importate con succes!`);
-                    }
+                    console.log('JSON structure is valid. Attempting import...', parsed.length);
+                    // Importăm direct
+                    onImport(parsed);
+                    // Dispecerizează un eveniment custom pentru ca hook-ul să detecteze schimbarea
+                    window.dispatchEvent(new Event('storage-sync'));
+                    console.log('Dispatched storage-sync event.');
+                    toast.success(`${parsed.length} prompt-uri importate cu succes!`);
                 } else {
+                    console.warn('Import eșuat: Structura JSON invalidă.', parsed);
                     toast.error('Fișierul JSON nu are formatul corect de Prompt[].');
                 }
-            } catch {
-                toast.error('Eroare la citirea fișierului JSON.');
+            } catch (err) {
+                console.error('Eroare parsing JSON:', err);
+                toast.error('Eroare la citirea sau procesarea fișierului JSON.');
             }
             if (fileInputRef.current) fileInputRef.current.value = '';
         };
@@ -102,10 +111,12 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
     };
 
     const syncFromGist = async () => {
+        console.log('syncFromGist started. Token:', !!githubToken, 'GistID:', gistId);
         if (!githubToken || !gistId) return toast.error('Token și Gist ID sunt necesare pentru a citi din cloud!');
         
         setIsSyncing(true);
         try {
+            console.log('Fetching gist from GitHub API...');
             const res = await fetch(`https://api.github.com/gists/${gistId}`, {
                 headers: {
                     'Authorization': `token ${githubToken}`,
@@ -113,18 +124,24 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
                 }
             });
 
+            console.log('Fetch response status:', res.status);
             if (!res.ok) throw new Error('Nu am găsit Gist-ul');
             
             const data = await res.json();
+            console.log('Gist data received. Files:', Object.keys(data.files));
             const fileData = data.files['prompt-library-db.json'];
             if (!fileData) throw new Error('Gist-ul nu conține fișierul așteptat');
             
             const parsed = JSON.parse(fileData.content);
+            console.log('Gist JSON parsed successfully:', parsed.length, 'items');
             if (Array.isArray(parsed)) {
-                if (window.confirm(`Acest cont conține ${parsed.length} prompt-uri. Suprascrii local?`)) {
-                    onImport(parsed);
-                    toast.success(`Au fost încărcate ${parsed.length} prompt-uri din Cloud!`);
-                }
+                console.log('Gist data is an array. Calling onImport...');
+                onImport(parsed);
+                window.dispatchEvent(new Event('storage-sync'));
+                console.log('Dispatched storage-sync event for Gist.');
+                toast.success(`Au fost încărcate ${parsed.length} prompt-uri din Cloud!`);
+            } else {
+                console.warn('Gist data is not an array:', parsed);
             }
         } catch (error) {
             console.error(error);

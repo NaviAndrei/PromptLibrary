@@ -12,6 +12,7 @@ import { LayoutGrid, List } from 'lucide-react';
 function App() {
     // Stocăm array-ul de prompt-uri în localStorage
     const [prompts, setPrompts] = useLocalStorage<Prompt[]>('prompts', []);
+    console.log('App re-rendered with prompts:', prompts.length);
     
     // Stocăm query-ul de căutare din SearchBar
     const [searchQuery, setSearchQuery] = useState('');
@@ -75,10 +76,18 @@ function App() {
                 createdAt: now,
                 updatedAt: now
             };
-            // Adăugăm prima dată noul prompt
+            // 2. Adăugăm prima dată noul prompt
             setPrompts([newPrompt, ...prompts]);
             toast.success('Prompt creat cu succes!');
         }
+    };
+
+    // Funcția pentru a procesa importul JSON
+    const handleImportPrompts = (imported: Prompt[]) => {
+        setPrompts(imported);
+        // Salvăm și direct în localStorage pentru siguranță maximă imediată
+        window.localStorage.setItem('prompts', JSON.stringify(imported));
+        toast.success(`Am importat ${imported.length} prompt-uri!`);
     };
 
     // Funcția pentru a deschide formularul pre-completat pentru un prompt existent
@@ -111,7 +120,7 @@ function App() {
                     <h1>Prompt Library</h1>
                     <p>Gestionează, filtrează și sincronizează prompt-urile AI direct din browser.</p>
                 </div>
-                <DataActions prompts={prompts} onImport={setPrompts} />
+                <DataActions prompts={prompts} onImport={handleImportPrompts} />
             </header>
 
             <div className="app-layout">
