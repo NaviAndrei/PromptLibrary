@@ -1,0 +1,43 @@
+name: CI - Production Validation (Lint & Build)
+
+# This workflow triggers on every Push or Pull Request towards 'main'
+# It ensures no breaking code reaches the production branch
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate:
+    name: Validation Run (Node v20)
+    runs-on: ubuntu-latest
+
+    # Limit permissions to avoid security risks
+    permissions:
+      contents: read
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js v20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm' # Speeds up installations by caching node_modules
+
+      - name: 📦 Clean install (npm ci)
+        run: npm ci
+
+      - name: 🔍 TypeScript & ESLint check
+        run: npm run lint
+        # If linting fails, the build will stop here, preventing deployment
+
+      - name: 🏗️ Production build
+        run: npm run build
+        # This confirms that the Vite application can be successfully compiled
+
+      - name: ✅ Final Status
+        if: success()
+        run: echo "Code is production ready. All checks passed."
