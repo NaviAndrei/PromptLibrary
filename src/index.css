@@ -34,9 +34,9 @@
   padding: 0;
 }
 
-/* Container principal ajustat pe centru cu 900px lățime max */
+/* Container principal ajustat pe centru cu 1100px lățime max pentru a permite view de grid generos */
 .container {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 2rem 1rem;
 }
@@ -331,7 +331,7 @@ button {
 
 /* Lista și Elementele Prompt */
 .prompt-list.grid {
-  column-width: 18rem; /* Vor încăpea natural 2 coloane lângă sidebar */
+  column-width: 16rem; /* Scalare corectă pentru minim 2 coloane lângă sidebar */
   column-gap: 1.5rem;
 }
 
