@@ -331,12 +331,15 @@ button {
 
 /* Lista și Elementele Prompt */
 .prompt-list.grid {
-  columns: 1 20rem; /* Native CSS Masonry */
-  gap: 1.5rem;
+  column-width: 18rem; /* Vor încăpea natural 2 coloane lângă sidebar */
+  column-gap: 1.5rem;
 }
 
 .prompt-list.grid > .prompt-card {
   break-inside: avoid-column;
+  page-break-inside: avoid;
+  display: inline-block;
+  width: 100%;
   margin-bottom: 1.5rem;
 }
 
