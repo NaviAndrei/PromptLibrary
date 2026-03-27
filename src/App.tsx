@@ -99,12 +99,13 @@ function App() {
             setEditingPrompt(null);
             toast.success('Prompt updated successfully!');
         } else {
-            // New prompt creation with native UUID
+            // Create new prompt (priority: form selection > global filter)
             const newPrompt: Prompt = {
                 ...promptData,
                 id: crypto.randomUUID(),
                 createdAt: now,
                 updatedAt: now,
+                workspaceId: promptData.workspaceId ?? currentWorkspaceId ?? undefined,
             };
             setPrompts([newPrompt, ...prompts]);
             toast.success('Prompt created successfully!');
@@ -145,6 +146,10 @@ function App() {
 
     const handleDeleteWorkspace = (id: string) => {
         setWorkspaces(prev => prev.filter(ws => ws.id !== id));
+        // Detach deleted workspace from all associated prompts for consistency
+        setPrompts(prev => prev.map(p =>
+            p.workspaceId === id ? { ...p, workspaceId: undefined } : p
+        ));
         // Reset to "All" if current workspace is deleted
         if (currentWorkspaceId === id) setCurrentWorkspaceId(null);
         toast.info('Workspace deleted.');
@@ -229,18 +234,23 @@ function App() {
                     <div className="stats-bar">
                         <div className="stats">
                             Total: {prompts.length} | Found: {filteredPrompts.length}
-                            {currentWorkspaceId && workspaces.find(w => w.id === currentWorkspaceId) && (
-                                <span className="workspace-filter-badge" style={{
-                                    marginLeft: '0.5rem',
-                                    background: workspaces.find(w => w.id === currentWorkspaceId)?.color,
-                                    color: 'white',
-                                    padding: '0.1rem 0.5rem',
-                                    borderRadius: '99px',
-                                    fontSize: '0.8rem',
-                                }}>
-                                    {workspaces.find(w => w.id === currentWorkspaceId)?.icon} {workspaces.find(w => w.id === currentWorkspaceId)?.name}
-                                </span>
-                            )}
+                            {(() => {
+                                // Optimized lookup: find the workspace once per render
+                                const currentWs = currentWorkspaceId ? workspaces.find(w => w.id === currentWorkspaceId) : null;
+                                if (!currentWs) return null;
+                                return (
+                                    <span className="workspace-filter-badge" style={{
+                                        marginLeft: '0.5rem',
+                                        background: currentWs.color,
+                                        color: 'white',
+                                        padding: '0.1rem 0.5rem',
+                                        borderRadius: '99px',
+                                        fontSize: '0.8rem',
+                                    }}>
+                                        {currentWs.icon} {currentWs.name}
+                                    </span>
+                                );
+                            })()}
                         </div>
                     </div>
 
