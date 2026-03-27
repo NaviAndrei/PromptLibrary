@@ -35,10 +35,15 @@ export function VariableInjector({ body }: VariableInjectorProps) {
     };
 
     // Copy prompt with injected variables to clipboard
-    const handleCopy = () => {
+    const handleCopy = async () => {
         const injected = injectVariables(body, values);
-        navigator.clipboard.writeText(injected);
-        toast.success('Prompt copied with variables injected!');
+        try {
+            await navigator.clipboard.writeText(injected);
+            toast.success('Prompt copied with variables injected!');
+        } catch (error) {
+            console.error('Failed to copy injected prompt:', error);
+            toast.error('Failed to copy to clipboard. Please check browser permissions.');
+        }
     };
 
     return (

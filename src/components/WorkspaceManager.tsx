@@ -81,9 +81,11 @@ export function WorkspaceManager({
                     <div className="workspace-icons-grid">
                         {PRESET_ICONS.map(icon => (
                             <button
+                                type="button"
                                 key={icon}
                                 onClick={() => setNewIcon(icon)}
                                 className={`workspace-icon-btn ${newIcon === icon ? 'selected' : ''}`}
+                                aria-label={`Select icon ${icon}`}
                             >
                                 {icon}
                             </button>
@@ -93,10 +95,12 @@ export function WorkspaceManager({
                     <div className="workspace-colors-grid">
                         {PRESET_COLORS.map(color => (
                             <button
+                                type="button"
                                 key={color}
                                 onClick={() => setNewColor(color)}
                                 className="workspace-color-btn"
                                 style={{ background: color, outline: newColor === color ? `2px solid ${color}` : 'none', outlineOffset: '2px' }}
+                                aria-label={`Select color ${color}`}
                             />
                         ))}
                     </div>

@@ -116,7 +116,7 @@ export function VersionHistory({ promptTitle, versions, onClose }: VersionHistor
                     // Show diffs between consecutive versions
                     <div className="version-list">
                         {sorted.slice(0, -1).map((version, idx) => (
-                            <div key={version.savedAt} className="version-entry">
+                            <div key={`${version.savedAt}-${idx}`} className="version-entry">
                                 <div className="version-meta">
                                     <span className="version-badge">v{sorted.length - idx - 1} → v{sorted.length - idx}</span>
                                     <span className="version-date">{formatDate(version.savedAt)}</span>
