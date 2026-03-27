@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { Prompt, PromptVersion, Workspace } from '../types';
 import { toast } from 'sonner';
 import { Edit2, Copy, Trash2, ChevronDown, ChevronUp, Download, Clock } from 'lucide-react';
@@ -25,6 +25,15 @@ export function PromptList({ prompts, viewMode, onEdit, onDelete, getVersions, w
 
     // State for which prompt's history is being viewed
     const [historyPromptId, setHistoryPromptId] = useState<string | null>(null);
+
+    // Optimized O(1) workspace lookup
+    const workspaceMap = useMemo(() => {
+        const map: Record<string, Workspace> = {};
+        workspaces.forEach(ws => {
+            map[ws.id] = ws;
+        });
+        return map;
+    }, [workspaces]);
 
     // Copy to clipboard handler
     const handleCopy = async (text: string) => {
@@ -90,8 +99,8 @@ export function PromptList({ prompts, viewMode, onEdit, onDelete, getVersions, w
             <div className={`prompt-list ${viewMode}`} id="prompt-list">
                 {prompts.map(prompt => {
                     const isExpanded = expandedIds.has(prompt.id);
-                    // Find workspace associated with the prompt
-                    const promptWorkspace = workspaces.find(w => w.id === prompt.workspaceId);
+                    // O(1) Lookup of the workspace associated with the prompt
+                    const promptWorkspace = prompt.workspaceId ? workspaceMap[prompt.workspaceId] : null;
 
                     return (
                         <div key={prompt.id} className="prompt-card card">
