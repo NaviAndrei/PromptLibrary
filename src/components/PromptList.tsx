@@ -1,23 +1,30 @@
 import { useState } from 'react';
-import type { Prompt } from '../types';
+import type { Prompt, PromptVersion, Workspace } from '../types';
 import { toast } from 'sonner';
-import { Edit2, Copy, Trash2, ChevronDown, ChevronUp, Download } from 'lucide-react';
+import { Edit2, Copy, Trash2, ChevronDown, ChevronUp, Download, Clock } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { VariableInjector } from './VariableInjector';
+import { VersionHistory } from './VersionHistory';
 
 interface PromptListProps {
     prompts: Prompt[];
     viewMode: 'list' | 'grid';
     onEdit: (prompt: Prompt) => void;
     onDelete: (id: string) => void;
+    getVersions: (promptId: string) => PromptVersion[];
+    workspaces: Workspace[];
 }
 
 // Renderizează lista de prompt-uri și acțiunile asociate fiecăruia
-export function PromptList({ prompts, viewMode, onEdit, onDelete }: PromptListProps) {
+export function PromptList({ prompts, viewMode, onEdit, onDelete, getVersions, workspaces }: PromptListProps) {
     // Păstrăm local un array cu ID-urile prompturilor extinse (pentru afișarea conținutului complet)
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+    // ID-ul prompt-ului pentru care se afișează panoul de Version History
+    const [historyPromptId, setHistoryPromptId] = useState<string | null>(null);
 
     // Funcție pentru a copia în clipboard body-ul
     const handleCopy = async (text: string) => {
@@ -62,99 +69,142 @@ export function PromptList({ prompts, viewMode, onEdit, onDelete }: PromptListPr
         );
     }
 
-    return (
-        <div className={`prompt-list ${viewMode}`}>
-            {prompts.map(prompt => {
-                const isExpanded = expandedIds.has(prompt.id);
-                
-                return (
-                    <div key={prompt.id} className="prompt-card card">
-                        <div className="prompt-header">
-                            <div>
-                                <h4>{prompt.title}</h4>
-                                <span className="model-badge">{prompt.model}</span>
-                            </div>
-                            <div className="prompt-actions">
-                                <button onClick={() => onEdit(prompt)} className="btn-icon" title="Edit">
-                                    <Edit2 size={16} />
-                                </button>
-                                <button onClick={() => handleCopy(prompt.body)} className="btn-icon" title="Copy">
-                                    <Copy size={16} />
-                                </button>
-                                <button onClick={() => handleExportMD(prompt)} className="btn-icon" title="Export ca Markdown">
-                                    <Download size={16} />
-                                </button>
-                                {/* Folosim window.confirm pentru confirmarea ștergerii, o metodă integrată nativ */}
-                                <button 
-                                    onClick={() => window.confirm('Ești sigur că vrei să ștergi?') && onDelete(prompt.id)} 
-                                    className="btn-icon delete"
-                                    title="Delete"
-                                >
-                                    <Trash2 size={16} />
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div className="prompt-tags">
-                            {prompt.tags.map(tag => (
-                                <span key={tag} className="tag-badge">#{tag}</span>
-                            ))}
-                            <span className="token-badge" title="Estimated Tokens">
-                                ~{Math.round(prompt.body.length / 4)} tokens
-                            </span>
-                        </div>
+    // Prompt-ul selectat pentru vizualizare istorică
+    const historyPrompt = historyPromptId ? prompts.find(p => p.id === historyPromptId) : null;
 
-                        <div className="prompt-body-preview">
-                            {isExpanded ? (
-                                <div className="markdown-body">
-                                    <ReactMarkdown
-                                        remarkPlugins={[remarkGfm]}
-                                        components={{
-                                            code({ inline, className, children, ...props }: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & { inline?: boolean }) {
-                                                const match = /language-(\w+)/.exec(className || '');
-                                                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                                                const { ref, ...rest } = props;
-                                                return !inline && match ? (
-                                                    <SyntaxHighlighter
-                                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                        style={vscDarkPlus as any}
-                                                        language={match[1]}
-                                                        PreTag="div"
-                                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                        {...(rest as any)}
-                                                    >
-                                                        {String(children).replace(/\n$/, '')}
-                                                    </SyntaxHighlighter>
-                                                ) : (
-                                                    <code className={className} {...props}>
-                                                        {children}
-                                                    </code>
-                                                );
-                                            }
-                                        }}
-                                    >
-                                        {prompt.body}
-                                    </ReactMarkdown>
+    return (
+        <>
+            {/* Modal pentru Version History (se randează deasupra listei) */}
+            {historyPrompt && (
+                <VersionHistory
+                    promptTitle={historyPrompt.title}
+                    versions={[
+                        // Includem versiunea curentă ca ultim snapshot pentru context
+                        { promptId: historyPrompt.id, body: historyPrompt.body, savedAt: historyPrompt.updatedAt },
+                        ...getVersions(historyPrompt.id),
+                    ]}
+                    onClose={() => setHistoryPromptId(null)}
+                />
+            )}
+
+            <div className={`prompt-list ${viewMode}`}>
+                {prompts.map(prompt => {
+                    const isExpanded = expandedIds.has(prompt.id);
+                    // Găsim workspace-ul asociat prompt-ului (dacă există)
+                    const promptWorkspace = workspaces.find(w => w.id === prompt.workspaceId);
+
+                    return (
+                        <div key={prompt.id} className="prompt-card card">
+                            <div className="prompt-header">
+                                <div>
+                                    <h4>
+                                        {prompt.title}
+                                        {/* Badge colorat pentru workspace */}
+                                        {promptWorkspace && (
+                                            <span
+                                                className="workspace-chip"
+                                                style={{ background: promptWorkspace.color }}
+                                                title={`Workspace: ${promptWorkspace.name}`}
+                                            >
+                                                {promptWorkspace.icon} {promptWorkspace.name}
+                                            </span>
+                                        )}
+                                    </h4>
+                                    <span className="model-badge">{prompt.model}</span>
                                 </div>
-                            ) : (
-                                <pre className="collapsed">
-                                    {prompt.body.length > 100 ? prompt.body.substring(0, 100) + '...' : prompt.body}
-                                </pre>
-                            )}
-                            
-                            {prompt.body.length > 100 && (
-                                <button className="expand-btn" onClick={() => toggleExpand(prompt.id)}>
-                                    {isExpanded ? (
-                                        <><ChevronUp size={16} /> Restrânge</>
-                                    ) : (
-                                        <><ChevronDown size={16} /> Extinde</>
-                                    )}
-                                </button>
-                            )}
+                                <div className="prompt-actions">
+                                    <button onClick={() => onEdit(prompt)} className="btn-icon" title="Editează">
+                                        <Edit2 size={16} />
+                                    </button>
+                                    <button onClick={() => handleCopy(prompt.body)} className="btn-icon" title="Copiază">
+                                        <Copy size={16} />
+                                    </button>
+                                    <button onClick={() => handleExportMD(prompt)} className="btn-icon" title="Export ca Markdown">
+                                        <Download size={16} />
+                                    </button>
+                                    {/* Buton nou: afișare Version History */}
+                                    <button
+                                        onClick={() => setHistoryPromptId(prompt.id)}
+                                        className="btn-icon"
+                                        title="Istoricul versiunilor"
+                                    >
+                                        <Clock size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => window.confirm('Ești sigur că vrei să ștergi?') && onDelete(prompt.id)}
+                                        className="btn-icon delete"
+                                        title="Șterge"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="prompt-tags">
+                                {prompt.tags.map(tag => (
+                                    <span key={tag} className="tag-badge">#{tag}</span>
+                                ))}
+                                <span className="token-badge" title="Estimated Tokens">
+                                    ~{Math.round(prompt.body.length / 4)} tokens
+                                </span>
+                            </div>
+
+                            <div className="prompt-body-preview">
+                                {isExpanded ? (
+                                    <>
+                                        <div className="markdown-body">
+                                            <ReactMarkdown
+                                                remarkPlugins={[remarkGfm]}
+                                                components={{
+                                                    code({ inline, className, children, ...props }: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & { inline?: boolean }) {
+                                                        const match = /language-(\w+)/.exec(className || '');
+                                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                                        const { ref, ...rest } = props;
+                                                        return !inline && match ? (
+                                                            <SyntaxHighlighter
+                                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                                style={vscDarkPlus as any}
+                                                                language={match[1]}
+                                                                PreTag="div"
+                                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                                {...(rest as any)}
+                                                            >
+                                                                {String(children).replace(/\n$/, '')}
+                                                            </SyntaxHighlighter>
+                                                        ) : (
+                                                            <code className={className} {...props}>
+                                                                {children}
+                                                            </code>
+                                                        );
+                                                    }
+                                                }}
+                                            >
+                                                {prompt.body}
+                                            </ReactMarkdown>
+                                        </div>
+                                        {/* VariableInjector apare doar când prompt-ul e extins și conține {{variabile}} */}
+                                        <VariableInjector body={prompt.body} />
+                                    </>
+                                ) : (
+                                    <pre className="collapsed">
+                                        {prompt.body.length > 100 ? prompt.body.substring(0, 100) + '...' : prompt.body}
+                                    </pre>
+                                )}
+
+                                {prompt.body.length > 100 && (
+                                    <button className="expand-btn" onClick={() => toggleExpand(prompt.id)}>
+                                        {isExpanded ? (
+                                            <><ChevronUp size={16} /> Restrânge</>
+                                        ) : (
+                                            <><ChevronDown size={16} /> Extinde</>
+                                        )}
+                                    </button>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                );
-            })}
-        </div>
+                    );
+                })}
+            </div>
+        </>
     );
 }
