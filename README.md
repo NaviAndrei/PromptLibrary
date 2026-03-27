@@ -4,20 +4,31 @@ A sleek, production-quality web application designed to help AI enthusiasts and 
 
 ---
 
-## ✨ Key Features
+## ✨ Features
 
--   **Local-First Persistence**: All your data is securely stored in your browser's `localStorage`.
--   **Real-time Search**: Instant filtering by title, body text, or tags.
--   **Smart Formatting**: Support for multiple AI models (GPT-4, Claude 3.7, etc.) and tag-based organization.
--   **Copy to Clipboard**: Quick actions to grab your prompts and use them in any AI interface.
--   **Clean UI**: A premium, responsive design with a focus on typography and readability.
+- **🚀 PWA Support**: Work offline and install as a native app on mobile or desktop.
+- **☁️ Cloud Sync**: Securely sync your prompts using GitHub Gists (No database needed!).
+- **📑 Rich Formatting**: Markdown support with syntax highlighting for code blocks.
+- **🔍 Advanced Search**: Instant filtering by title, body, or tags.
+- **🏷️ Tags Cloud**: Interactive sidebar to organize and filter your library.
+- **💾 Data Control**: Export/Import your entire library as JSON or individual prompts as Markdown.
+- **📊 Token Estimator**: Real-time token count estimation for each prompt.
+- **🛡️ Secure & Private**: All data stays in your browser or your private GitHub Gist.
+- **🌓 Modern UI**: Responsive design with Grid (Masonry) and List view modes.
 
-## 🛠️ Technical Stack
+## 🛠️ Technology Stack
 
--   **Frontend**: React 18+ (Hooks-based architecture)
--   **Logic**: TypeScript (Strict typing for robust data handling)
--   **Tooling**: Vite (Ultra-fast build and development)
--   **Styling**: Custom Vanilla CSS
+- **React 19** & **TypeScript**
+- **Vite** (Build Tool & PWA)
+- **Lucide React** (Icons)
+- **Sonner** (Toast Notifications)
+- **Markdown** (remark-gfm, react-syntax-highlighter)
+- **GitHub Actions** (CI/CD)
+- **GitHub Pages** (Hosting)
+
+## 📋 Changelog
+
+Detailed changes for each release can be found in the [CHANGELOG.md](./CHANGELOG.md) file.
 
 ## 🚀 Getting Started
 
@@ -28,7 +39,7 @@ A sleek, production-quality web application designed to help AI enthusiasts and 
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/vostru-username/PromptLibrary.git
+   git clone https://github.com/NaviAndrei/PromptLibrary.git
    ```
 2. Navigate to the project directory:
    ```bash
@@ -51,9 +62,21 @@ Build the project for production:
 npm run build
 ```
 
-## 📜 License
+### 🗺️ Roadmap
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+- [x] PWA Support & Offline Mode
+- [x] JSON Import/Export & Markdown Export
+- [x] GitHub Gist Cloud Sync
+- [x] Markdown Rendering & Syntax Highlighting
+- [ ] Dark Mode Toggle
+- [ ] Multiple Gist support for shared libraries
+- [ ] Advanced prompt templates with input variables
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+
+Copyright (c) 2026 **Ivan Andrei (NaviAndrei)**
 
 ---
 *Developed with ❤️ as a modern prompt management solution.*
