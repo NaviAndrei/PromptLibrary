@@ -167,7 +167,8 @@ function App() {
                 </div>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     <button
-                        className="btn-icon"
+                        className="btn-icon" 
+
                         onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
                         title={theme === 'light' ? 'Treci pe Dark Mode' : 'Treci pe Light Mode'}
                     >
