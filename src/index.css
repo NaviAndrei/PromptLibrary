@@ -584,3 +584,339 @@ button {
   border: 1px dashed var(--border-color);
   border-radius: var(--radius-lg);
 }
+
+/* ==========================================
+   WORKSPACE MANAGER
+   ========================================== */
+.workspace-manager {
+  margin-bottom: 0.5rem;
+}
+
+.workspace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  color: var(--text-dark);
+}
+
+.workspace-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.workspace-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  border-left: 3px solid transparent;
+}
+
+.workspace-item:hover {
+  background: var(--bg-color);
+  color: var(--text-dark);
+}
+
+.workspace-item.active {
+  background: var(--primary-color);
+  color: white;
+  border-left-color: transparent !important;
+}
+
+.workspace-item-name {
+  flex: 1;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-delete-btn {
+  opacity: 0;
+  transition: opacity 0.15s;
+  padding: 0.2rem;
+}
+
+.workspace-item:hover .workspace-delete-btn {
+  opacity: 1;
+}
+
+.workspace-add-form {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.workspace-name-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: var(--surface-color);
+  color: var(--text-dark);
+  outline: none;
+}
+
+.workspace-name-input:focus {
+  border-color: var(--primary-color);
+}
+
+.workspace-icons-grid,
+.workspace-colors-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.workspace-icon-btn {
+  font-size: 1.1rem;
+  padding: 0.25rem 0.3rem;
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  background: var(--surface-color);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.workspace-icon-btn.selected,
+.workspace-icon-btn:hover {
+  border-color: var(--primary-color);
+}
+
+.workspace-color-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.workspace-color-btn:hover {
+  transform: scale(1.2);
+}
+
+/* Chip colorat afisat pe cardurile de prompt */
+.workspace-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  color: white;
+  padding: 0.1rem 0.5rem;
+  border-radius: 99px;
+  margin-left: 0.5rem;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+/* Divider între workspace manager și Tags Cloud în sidebar */
+.sidebar-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 1rem 0;
+}
+
+/* Selector workspace în formular */
+.workspace-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 1rem;
+  background: var(--surface-color);
+  color: var(--text-dark);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.workspace-select:focus {
+  border-color: var(--primary-color);
+}
+
+/* ==========================================
+   VARIABLE INJECTOR
+   ========================================== */
+.variable-injector {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.08));
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: var(--radius-md);
+}
+
+.variable-injector-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 0.75rem;
+}
+
+.variable-inputs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.variable-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.variable-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--primary-color);
+  min-width: 120px;
+  margin-bottom: 0;
+}
+
+.variable-label code {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--primary-color);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.82rem;
+}
+
+.variable-input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: var(--surface-color);
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.variable-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.variable-copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  justify-content: center;
+}
+
+/* ==========================================
+   VERSION HISTORY & DIFF VIZUAL
+   ========================================== */
+.version-history-modal {
+  max-width: 700px;
+  width: 95%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.version-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.version-entry {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.version-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.version-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: var(--primary-color);
+  color: white;
+  padding: 0.15rem 0.5rem;
+  border-radius: 99px;
+}
+
+.version-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Block diff vizual linie-cu-linie */
+.diff-view {
+  font-family: 'Consolas', 'Fira Code', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+.diff-line {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.1rem 0.75rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.diff-line.diff-added {
+  background: rgba(16, 185, 129, 0.12);
+  border-left: 3px solid #10b981;
+}
+
+.diff-line.diff-removed {
+  background: rgba(239, 68, 68, 0.12);
+  border-left: 3px solid #ef4444;
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+
+.diff-line.diff-equal {
+  color: var(--text-muted);
+  border-left: 3px solid transparent;
+}
+
+.diff-marker {
+  font-weight: 700;
+  user-select: none;
+  min-width: 12px;
+}
+
+.diff-line.diff-added .diff-marker { color: #10b981; }
+.diff-line.diff-removed .diff-marker { color: #ef4444; }
+.diff-line.diff-equal .diff-marker { color: var(--border-color); }
+
+.diff-text {
+  flex: 1;
+}
+

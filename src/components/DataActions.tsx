@@ -29,7 +29,7 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        toast.success('Backup JSON exportat cu succes!');
+        toast.success('Backup JSON exported successfully!');
     };
 
     const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,28 +38,21 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
 
         const reader = new FileReader();
         reader.onload = (event) => {
-            console.log('FileReader onload triggered');
             try {
                 const result = event.target?.result as string;
-                console.log('File read result length:', result?.length);
                 const parsed = JSON.parse(result);
-                console.log('JSON parsed, isArray:', Array.isArray(parsed));
                 
                 if (Array.isArray(parsed) && parsed.every(p => p.title && p.body && p.id)) {
-                    console.log('JSON structure is valid. Attempting import...', parsed.length);
-                    // Importăm direct
                     onImport(parsed);
-                    // Dispecerizează un eveniment custom pentru ca hook-ul să detecteze schimbarea
+                    // Dispatch custom event for storage sync
                     window.dispatchEvent(new Event('storage-sync'));
-                    console.log('Dispatched storage-sync event.');
-                    toast.success(`${parsed.length} prompt-uri importate cu succes!`);
+                    toast.success(`${parsed.length} prompts imported successfully!`);
                 } else {
-                    console.warn('Import eșuat: Structura JSON invalidă.', parsed);
-                    toast.error('Fișierul JSON nu are formatul corect de Prompt[].');
+                    toast.error('Invalid JSON structure. Needs to be Prompt[].');
                 }
             } catch (err) {
-                console.error('Eroare parsing JSON:', err);
-                toast.error('Eroare la citirea sau procesarea fișierului JSON.');
+                console.error('JSON parsing error:', err);
+                toast.error('Error reading or processing JSON file.');
             }
             if (fileInputRef.current) fileInputRef.current.value = '';
         };
@@ -71,7 +64,7 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
     };
 
     const syncToGist = async () => {
-        if (!githubToken) return toast.error('Setează un GitHub Personal Access Token întâi!');
+        if (!githubToken) return toast.error('Set a GitHub Personal Access Token first!');
         
         setIsSyncing(true);
         try {
@@ -87,7 +80,7 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    description: 'Tabelul de Prompt-uri din PromptLibrary',
+                    description: 'Prompts table from PromptLibrary',
                     public: false,
                     files: {
                         'prompt-library-db.json': {
@@ -97,26 +90,24 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
                 })
             });
 
-            if (!res.ok) throw new Error('Request a eșuat ' + res.status);
+            if (!res.ok) throw new Error('Request failed with status ' + res.status);
             
             const data = await res.json();
-            if (!gistId) setGistId(data.id); // Save exactly once
+            if (!gistId) setGistId(data.id);
             
-            toast.success('Sincronizare în Cloud (' + (gistId ? 'Update' : 'Creare') + ') reușită!');
+            toast.success('Cloud Sync (' + (gistId ? 'Update' : 'Create') + ') successful!');
         } catch (error) {
             console.error(error);
-            toast.error('Eroare la sincronizarea pe Gist.');
+            toast.error('Error syncing to Gist.');
         }
         setIsSyncing(false);
     };
 
     const syncFromGist = async () => {
-        console.log('syncFromGist started. Token:', !!githubToken, 'GistID:', gistId);
-        if (!githubToken || !gistId) return toast.error('Token și Gist ID sunt necesare pentru a citi din cloud!');
+        if (!githubToken || !gistId) return toast.error('Token and Gist ID are required to pull from cloud!');
         
         setIsSyncing(true);
         try {
-            console.log('Fetching gist from GitHub API...');
             const res = await fetch(`https://api.github.com/gists/${gistId}`, {
                 headers: {
                     'Authorization': `token ${githubToken}`,
@@ -124,34 +115,29 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
                 }
             });
 
-            console.log('Fetch response status:', res.status);
-            if (!res.ok) throw new Error('Nu am găsit Gist-ul');
+            if (!res.ok) throw new Error('Gist not found');
             
             const data = await res.json();
-            console.log('Gist data received. Files:', Object.keys(data.files));
             const fileData = data.files['prompt-library-db.json'];
-            if (!fileData) throw new Error('Gist-ul nu conține fișierul așteptat');
+            if (!fileData) throw new Error('Gist does not contain the expected file');
             
             const parsed = JSON.parse(fileData.content);
-            console.log('Gist JSON parsed successfully:', parsed.length, 'items');
             if (Array.isArray(parsed)) {
-                console.log('Gist data is an array. Calling onImport...');
                 onImport(parsed);
                 window.dispatchEvent(new Event('storage-sync'));
-                console.log('Dispatched storage-sync event for Gist.');
-                toast.success(`Au fost încărcate ${parsed.length} prompt-uri din Cloud!`);
+                toast.success(`Loaded ${parsed.length} prompts from Cloud!`);
             } else {
                 console.warn('Gist data is not an array:', parsed);
             }
         } catch (error) {
             console.error(error);
-            toast.error('Eroare la descărcarea din Gist.');
+            toast.error('Error downloading from Gist.');
         }
         setIsSyncing(false);
     };
 
     return (
-        <div className="data-actions">
+        <div className="data-actions" id="data-actions">
             <input 
                 type="file" 
                 accept=".json" 
@@ -160,13 +146,13 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
                 onChange={handleImportFile} 
             />
             
-            <button className="btn-secondary" onClick={handleExport} title="Descarcă Backup Local">
+            <button className="btn-secondary" onClick={handleExport} title="Download Local Backup">
                 <Download size={16} /> <span className="hide-mobile">Export JSON</span>
             </button>
-            <button className="btn-secondary" onClick={triggerImport} title="Încarcă Backup Local">
+            <button className="btn-secondary" onClick={triggerImport} title="Upload Local Backup">
                 <Upload size={16} /> <span className="hide-mobile">Import JSON</span>
             </button>
-            <button className="btn-primary" onClick={() => setShowSyncModal(true)} title="Sincronizează via GitHub">
+            <button className="btn-primary" onClick={() => setShowSyncModal(true)} title="Sync via GitHub">
                 <CloudSync size={16} /> <span className="hide-mobile">Cloud Sync</span>
             </button>
 
@@ -181,11 +167,11 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
                         </div>
                         <div className="modal-body">
                             <p className="text-muted" style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>
-                                Salvează automat prompturile tale într-un Gist Secret. 
-                                Creează un <a href="https://github.com/settings/tokens/new" target="_blank" rel="noreferrer" style={{color: 'var(--primary-color)'}}>Token Nou</a> cu permisiunea (scope) `gist`.
+                                Automatically save your prompts to a Secret Gist. 
+                                Create a <a href="https://github.com/settings/tokens/new" target="_blank" rel="noreferrer" style={{color: 'var(--primary-color)'}}>New Token</a> with the `gist` scope.
                             </p>
                             <div className="form-group">
-                                <label>GitHub PAT Token (salvat strict local)</label>
+                                <label>GitHub PAT Token (saved locally only)</label>
                                 <input 
                                     type="password" 
                                     value={githubToken} 
@@ -194,12 +180,12 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Gist ID (se completează auto. la primul Push)</label>
+                                <label>Gist ID (auto-filled on first Push)</label>
                                 <input 
                                     type="text" 
                                     value={gistId} 
                                     onChange={e => setGistId(e.target.value)} 
-                                    placeholder="ex: abcd1234efgh5678"
+                                    placeholder="e.g., abcd1234efgh5678"
                                 />
                             </div>
                             <div className="modal-actions" style={{justifyContent: 'flex-end'}}>

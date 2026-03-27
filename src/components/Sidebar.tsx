@@ -6,40 +6,38 @@ interface SidebarProps {
     onSelectTag: (tag: string | null) => void;
 }
 
+// Sidebar displays only Tags Cloud - WorkspaceManager is rendered separately in App.tsx
 export function Sidebar({ tags, selectedTag, onSelectTag }: SidebarProps) {
-    if (tags.length === 0) {
-        return (
-            <aside className="sidebar">
-                <h3>Tags</h3>
-                <p className="text-muted">Niciun tag disponibil.</p>
-            </aside>
-        );
-    }
-
     return (
-        <aside className="sidebar">
+        <div className="sidebar-tags-section" id="sidebar-tags">
             <div className="sidebar-header">
                 <h3><Tag size={18} /> Tags Cloud</h3>
             </div>
-            
-            <ul className="tags-list">
-                <li 
-                    className={selectedTag === null ? 'active' : ''} 
-                    onClick={() => onSelectTag(null)}
-                >
-                    Toate
-                </li>
-                {tags.map(([tag, count]) => (
-                    <li 
-                        key={tag} 
-                        className={selectedTag === tag ? 'active' : ''}
-                        onClick={() => onSelectTag(tag === selectedTag ? null : tag)}
+
+            {tags.length === 0 ? (
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', padding: '0.5rem 0' }}>
+                    No tags available.
+                </p>
+            ) : (
+                <ul className="tags-list">
+                    <li
+                        className={selectedTag === null ? 'active' : ''}
+                        onClick={() => onSelectTag(null)}
                     >
-                        <span className="tag-name">#{tag}</span>
-                        <span className="tag-count">{count}</span>
+                        All
                     </li>
-                ))}
-            </ul>
-        </aside>
+                    {tags.map(([tag, count]) => (
+                        <li
+                            key={tag}
+                            className={selectedTag === tag ? 'active' : ''}
+                            onClick={() => onSelectTag(tag === selectedTag ? null : tag)}
+                        >
+                            <span className="tag-name">#{tag}</span>
+                            <span className="tag-count">{count}</span>
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
     );
 }
