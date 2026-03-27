@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import type { PromptVersion } from '../types';
 import { X, Clock } from 'lucide-react';
 
@@ -8,17 +9,20 @@ interface VersionHistoryProps {
 }
 
 // ========================
-// LCS (Longest Common Subsequence) Algorithm for native visual diff
-// Returns an array of operations: 'equal' | 'added' | 'removed'
+// LCS (Longest Common Subsequence) – O(m·n) native visual diff
+// NOTE: Capped at MAX_LINES per side to prevent UI blocking on very long prompts.
 // ========================
+const MAX_LINES = 300;
+
 interface DiffPart {
     text: string;
     type: 'equal' | 'added' | 'removed';
 }
 
 function computeDiff(oldText: string, newText: string): DiffPart[] {
-    const oldLines = oldText.split('\n');
-    const newLines = newText.split('\n');
+    // Limit input size to cap worst-case O(m·n) memory and time usage
+    const oldLines = oldText.split('\n').slice(0, MAX_LINES);
+    const newLines = newText.split('\n').slice(0, MAX_LINES);
 
     const m = oldLines.length;
     const n = newLines.length;
@@ -58,9 +62,10 @@ function computeDiff(oldText: string, newText: string): DiffPart[] {
     return parts;
 }
 
-// Sub-component for displaying a diff between two versions
+// Sub-component: memoizes the diff to avoid recalculation on parent re-renders
 function DiffView({ oldBody, newBody }: { oldBody: string; newBody: string }) {
-    const parts = computeDiff(oldBody, newBody);
+    // useMemo ensures computeDiff only runs when the content actually changes
+    const parts = useMemo(() => computeDiff(oldBody, newBody), [oldBody, newBody]);
 
     return (
         <div className="diff-view">
@@ -116,7 +121,8 @@ export function VersionHistory({ promptTitle, versions, onClose }: VersionHistor
                     // Show diffs between consecutive versions
                     <div className="version-list">
                         {sorted.slice(0, -1).map((version, idx) => (
-                            <div key={`${version.savedAt}-${idx}`} className="version-entry">
+                            // Composite key: promptId + savedAt + idx guarantees uniqueness
+                            <div key={`${version.promptId}-${version.savedAt}-${idx}`} className="version-entry">
                                 <div className="version-meta">
                                     <span className="version-badge">v{sorted.length - idx - 1} → v{sorted.length - idx}</span>
                                     <span className="version-date">{formatDate(version.savedAt)}</span>

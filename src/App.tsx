@@ -81,11 +81,12 @@ function App() {
         const now = new Date().toISOString();
 
         if (editingPrompt) {
-            // Capture a snapshot of the current version BEFORE update
+            // Capture a snapshot of the OLD version - use its own updatedAt timestamp
+            // This ensures stable sort order and avoids duplicate keys in history
             const snapshot: PromptVersion = {
                 promptId: editingPrompt.id,
                 body: editingPrompt.body,
-                savedAt: now,
+                savedAt: editingPrompt.updatedAt ?? now,
             };
             setPromptHistory(prev => [snapshot, ...prev]);
 
