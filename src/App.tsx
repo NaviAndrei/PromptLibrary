@@ -106,8 +106,8 @@ function App() {
         <div className="container">
             <Toaster position="bottom-right" richColors />
             
-            <header className="header" style={{ display: 'flex', alignItems: 'center', textAlign: 'left' }}>
-                <div>
+            <header className="header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left', flexWrap: 'wrap', gap: '1rem' }}>
+                <div style={{ flex: 1, minWidth: '300px' }}>
                     <h1>Prompt Library</h1>
                     <p>Gestionează, filtrează și sincronizează prompt-urile AI direct din browser.</p>
                 </div>
@@ -118,46 +118,51 @@ function App() {
                 <Sidebar tags={allTags} selectedTag={selectedTag} onSelectTag={setSelectedTag} />
                 
                 <main className="main-content">
-                <SearchBar 
-                    searchQuery={searchQuery} 
-                    onSearchChange={setSearchQuery} 
-                />
-
-                <PromptForm 
-                    key={editingPrompt ? editingPrompt.id : 'new-prompt'}
-                    onSave={handleSavePrompt} 
-                    editingPrompt={editingPrompt} 
-                    onClear={handleClearForm} 
-                />
-
-                <div className="stats-bar">
-                    <div className="stats">
-                        Total: {prompts.length} | Găsite: {filteredPrompts.length}
+                    <div className="search-row" style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', alignItems: 'center' }}>
+                        <div style={{ flex: 1 }}>
+                            <SearchBar 
+                                searchQuery={searchQuery} 
+                                onSearchChange={setSearchQuery} 
+                            />
+                        </div>
+                        <div className="view-toggle">
+                            <button 
+                                className={`btn-icon ${viewMode === 'grid' ? 'active' : ''}`} 
+                                onClick={() => setViewMode('grid')}
+                                title="Grid View"
+                            >
+                                <LayoutGrid size={20} />
+                            </button>
+                            <button 
+                                className={`btn-icon ${viewMode === 'list' ? 'active' : ''}`} 
+                                onClick={() => setViewMode('list')}
+                                title="List View"
+                            >
+                                <List size={20} />
+                            </button>
+                        </div>
                     </div>
-                    <div className="view-toggle">
-                        <button 
-                            className={`btn-icon ${viewMode === 'grid' ? 'active' : ''}`} 
-                            onClick={() => setViewMode('grid')}
-                            title="Grid View"
-                        >
-                            <LayoutGrid size={18} />
-                        </button>
-                        <button 
-                            className={`btn-icon ${viewMode === 'list' ? 'active' : ''}`} 
-                            onClick={() => setViewMode('list')}
-                            title="List View"
-                        >
-                            <List size={18} />
-                        </button>
-                    </div>
-                </div>
 
-                <PromptList 
-                    prompts={filteredPrompts} 
-                    viewMode={viewMode}
-                    onEdit={handleEditPrompt} 
-                    onDelete={handleDeletePrompt} 
-                />
+                    <PromptForm 
+                        key={editingPrompt ? editingPrompt.id : 'new-prompt'}
+                        onSave={handleSavePrompt} 
+                        editingPrompt={editingPrompt} 
+                        existingTags={allTags.map(t => t[0])}
+                        onClear={handleClearForm} 
+                    />
+
+                    <div className="stats-bar">
+                        <div className="stats">
+                            Total: {prompts.length} | Găsite: {filteredPrompts.length}
+                        </div>
+                    </div>
+
+                    <PromptList 
+                        prompts={filteredPrompts} 
+                        viewMode={viewMode}
+                        onEdit={handleEditPrompt} 
+                        onDelete={handleDeletePrompt} 
+                    />
                 </main>
             </div>
         </div>
