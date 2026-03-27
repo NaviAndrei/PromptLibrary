@@ -331,8 +331,20 @@ button {
 
 /* Lista și Elementele Prompt */
 .prompt-list.grid {
-  column-width: 16rem; /* Scalare corectă pentru minim 2 coloane lângă sidebar */
+  column-count: 3; /* Forțăm browser-ul să folosească 3 coloane pe rezoluții mari */
   column-gap: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+  .prompt-list.grid {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .prompt-list.grid {
+    column-count: 1;
+  }
 }
 
 .prompt-list.grid > .prompt-card {
