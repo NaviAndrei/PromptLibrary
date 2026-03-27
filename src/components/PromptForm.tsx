@@ -76,11 +76,27 @@ export function PromptForm({ onSave, editingPrompt, existingTags, onClear }: Pro
                         onChange={e => setTagsInput(e.target.value)}
                         placeholder="Ex: refactor, python, clean-code"
                         list="tags-autocomplete"
+                        autoComplete="off"
                     />
                     <datalist id="tags-autocomplete">
-                        {existingTags.map(tag => (
-                            <option key={tag} value={tag} />
-                        ))}
+                        {(() => {
+                            // Logica pentru autocomplete multi-tag folosind datalist nativ
+                            const parts = tagsInput.split(',');
+                            const lastPart = parts[parts.length - 1].trim();
+                            const prefix = parts.length > 1 
+                                ? parts.slice(0, -1).join(', ') + ', ' 
+                                : '';
+
+                            return existingTags
+                                .filter(tag => 
+                                    tag.toLowerCase().includes(lastPart.toLowerCase()) &&
+                                    !parts.map(p => p.trim().toLowerCase()).includes(tag.toLowerCase())
+                                )
+                                .slice(0, 10)
+                                .map(tag => (
+                                    <option key={tag} value={`${prefix}${tag}`} />
+                                ));
+                        })()}
                     </datalist>
                 </div>
                 <div className="flex-1">
