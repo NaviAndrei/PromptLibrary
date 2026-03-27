@@ -105,7 +105,6 @@ function App() {
                 id: crypto.randomUUID(),
                 createdAt: now,
                 updatedAt: now,
-                workspaceId: currentWorkspaceId ?? undefined,
             };
             setPrompts([newPrompt, ...prompts]);
             toast.success('Prompt created successfully!');
