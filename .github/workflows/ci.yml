@@ -28,7 +28,7 @@ jobs:
           cache: 'npm' # Speeds up installations by caching node_modules
 
       - name: 📦 Clean install (npm ci)
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: 🔍 TypeScript & ESLint check
         run: npm run lint

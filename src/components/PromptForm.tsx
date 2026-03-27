@@ -4,11 +4,12 @@ import type { Prompt } from '../types';
 interface PromptFormProps {
     onSave: (prompt: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt'>) => void;
     editingPrompt: Prompt | null;
+    existingTags: string[];
     onClear: () => void;
 }
 
 // Formular pentru crearea sau editarea unui prompt
-export function PromptForm({ onSave, editingPrompt, onClear }: PromptFormProps) {
+export function PromptForm({ onSave, editingPrompt, existingTags, onClear }: PromptFormProps) {
     // Inițializăm state-ul din prima cu valorile dorite (se va re-rula datorită prop-ului 'key' din App.tsx)
     const [title, setTitle] = useState(editingPrompt?.title || '');
     const [body, setBody] = useState(editingPrompt?.body || '');
@@ -74,7 +75,13 @@ export function PromptForm({ onSave, editingPrompt, onClear }: PromptFormProps) 
                         value={tagsInput} 
                         onChange={e => setTagsInput(e.target.value)}
                         placeholder="Ex: refactor, python, clean-code"
+                        list="tags-autocomplete"
                     />
+                    <datalist id="tags-autocomplete">
+                        {existingTags.map(tag => (
+                            <option key={tag} value={tag} />
+                        ))}
+                    </datalist>
                 </div>
                 <div className="flex-1">
                     <label>Model recomandat:</label>
