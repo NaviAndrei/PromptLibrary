@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 // Hook generic pentru a stoca și citi date din localStorage
 // Utilizează inițializare "leneșă" (lazy initialization) pentru ca parsarea JSON să se facă doar la prima randare
@@ -15,6 +15,32 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
             return initialValue;
         }
     });
+
+    // Ascultăm schimbări externe în localStorage (ex: importuri din DataActions)
+    useEffect(() => {
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key === key || e.key === null) {
+                try {
+                    const item = window.localStorage.getItem(key);
+                    const newValue = item ? JSON.parse(item) : initialValue;
+                    setStoredValue(newValue);
+                    console.log(`Storage sync triggered for key: ${key}`, newValue?.length);
+                } catch (err) {
+                    console.error('Eroare la sincronizarea automată:', err);
+                }
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        // De asemenea ascultăm evenimente custom trimise manual cu dispatchEvent(new Event('storage'))
+        const handleCustomStorage = () => handleStorageChange({ key } as StorageEvent);
+        window.addEventListener('storage-sync', handleCustomStorage);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('storage-sync', handleCustomStorage);
+        };
+    }, [key, initialValue]);
 
     // Această funcție o prinde pe cea standard din React pentru a salva în localStorage simultan
     const setValue = (value: T | ((val: T) => T)) => {

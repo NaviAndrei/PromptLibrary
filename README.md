@@ -10,7 +10,7 @@ A sleek, production-quality web application designed to help AI enthusiasts and 
 - **☁️ Cloud Sync**: Securely sync your prompts using GitHub Gists (No database needed!).
 - **📑 Rich Formatting**: Markdown support with syntax highlighting for code blocks.
 - **🔍 Advanced Search**: Instant filtering by title, body, or tags.
-- **🏷️ Tags Cloud**: Interactive sidebar to organize and filter your library.
+- **🏷️ Smart Tags**: Interactive sidebar to organize your library and intelligent autocomplete when adding new prompts.
 - **💾 Data Control**: Export/Import your entire library as JSON or individual prompts as Markdown.
 - **📊 Token Estimator**: Real-time token count estimation for each prompt.
 - **🛡️ Secure & Private**: All data stays in your browser or your private GitHub Gist.
@@ -68,6 +68,7 @@ npm run build
 - [x] JSON Import/Export & Markdown Export
 - [x] GitHub Gist Cloud Sync
 - [x] Markdown Rendering & Syntax Highlighting
+- [x] Smart Tag Autocomplete
 - [ ] Dark Mode Toggle
 - [ ] Multiple Gist support for shared libraries
 - [ ] Advanced prompt templates with input variables
