@@ -5,8 +5,14 @@ import { toast } from 'sonner';
 /**
  * Enhanced hook to replace useLocalStorage with IndexedDB for large data sets.
  * Automatically performs a "One-Time Migration" from localStorage if it finds existing data.
+ *
+ * @param storeName   - The IndexedDB object store name.
+ * @param initialValue - Default value when no data exists.
+ * @param legacyKey   - Optional localStorage key used before migration (defaults to storeName).
+ *                      Pass this when the old localStorage key differs from the storeName,
+ *                      e.g. useIndexedDB('history', [], 'prompt-history').
  */
-export function useIndexedDB<T>(storeName: string, initialValue: T[]) {
+export function useIndexedDB<T>(storeName: string, initialValue: T[], legacyKey?: string) {
     const [storedValue, setStoredValue] = useState<T[]>(initialValue);
 
     // Load data from IndexedDB on component mount
@@ -20,8 +26,11 @@ export function useIndexedDB<T>(storeName: string, initialValue: T[]) {
                     setStoredValue(data);
                     console.log(`[DB] Loaded ${data.length} items from ${storeName}`);
                 } else {
-                    // 2. One-Time Migration: Check if there's old data in localStorage
-                    const legacyData = window.localStorage.getItem(storeName);
+                    // 2. One-Time Migration: Check if there's old data in localStorage.
+                    // Use legacyKey when the old localStorage key differs from the storeName
+                    // (e.g. history was stored under 'prompt-history' before IndexedDB migration).
+                    const migrationKey = legacyKey ?? storeName;
+                    const legacyData = window.localStorage.getItem(migrationKey);
                     if (legacyData) {
                         const parsed: T[] = JSON.parse(legacyData);
                         if (Array.isArray(parsed) && parsed.length > 0) {

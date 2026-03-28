@@ -19,7 +19,7 @@ function App() {
     // Large Datasets use IndexedDB for unlimited capacity
     const [prompts, setPrompts] = useIndexedDB<Prompt>('prompts', []);
     const [workspaces, setWorkspaces] = useIndexedDB<Workspace>('workspaces', []);
-    const [promptHistory, setPromptHistory] = useIndexedDB<PromptVersion>('history', []);
+    const [promptHistory, setPromptHistory] = useIndexedDB<PromptVersion>('history', [], 'prompt-history');
 
     // Lightweight UI settings continue to use localStorage for instant initialization
     const [currentWorkspaceId, setCurrentWorkspaceId] = useLocalStorage<string | null>('current-workspace', null);
