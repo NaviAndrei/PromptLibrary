@@ -1,17 +1,28 @@
-import { Document } from 'flexsearch';
-import type { SearchResult } from 'flexsearch';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+import FlexSearch from 'flexsearch';
 import type { Prompt } from '../types';
+
+// Vite 8 (Rolldown) requires accessing FlexSearch classes via default import.
+// Using 'any' here is intentional — FlexSearch's ESM bundle doesn't ship TypeScript types.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const FlexSearchAny = FlexSearch as any;
+
+interface SearchResult {
+    field: string;
+    result: (string | number)[];
+}
 
 /**
  * High-performance search service using FlexSearch's Document Index.
  * This singleton resides in memory for ultra-fast (O(1) perception) full-text searching.
  */
 class SearchService {
-    private index: Document;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private index: any;
     private initialized = false;
 
     constructor() {
-        this.index = new Document({
+        this.index = new FlexSearchAny.Document({
             preset: 'match',
             tokenize: 'full',
             cache: true,
@@ -27,9 +38,6 @@ class SearchService {
      */
     public initialize(prompts: Prompt[]) {
         if (this.initialized) {
-            // If already initialized, we could just return or clear
-            // For now, let's just clear for a clean state
-            // (Note: FlexSearch doesn't have a simple clear(), so we recreate)
             this.rebuild(prompts);
             return;
         }
@@ -40,7 +48,7 @@ class SearchService {
     }
 
     private rebuild(prompts: Prompt[]) {
-        this.index = new Document({
+        this.index = new FlexSearchAny.Document({
             preset: 'match',
             tokenize: 'full',
             cache: true,
@@ -69,22 +77,21 @@ class SearchService {
 
     /**
      * Perform a full-text search across title, body, and tags.
-     * Returns an array of IDs matching the query.
+     * Returns an array of string IDs matching the query.
      */
     public search(query: string): string[] {
         if (!query.trim()) return [];
 
-        const results = this.index.search(query, {
+        const results: SearchResult[] = this.index.search(query, {
             enrich: false,
-            limit: 100, // Reasonable cap for UI
+            limit: 100,
             suggest: true
         });
 
-        // Flatten the multi-field result format provided by FlexSearch Document index
-        // format: [{ field: 'title', result: [...] }, ...]
+        // Flatten the multi-field result format: [{ field: 'title', result: [...] }, ...]
         const ids = new Set<string>();
         results.forEach((res: SearchResult) => {
-            res.result.forEach((id: string) => ids.add(id));
+            res.result.forEach((id: string | number) => ids.add(String(id)));
         });
 
         return Array.from(ids);

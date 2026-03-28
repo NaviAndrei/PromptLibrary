@@ -17,7 +17,7 @@ declare module 'flexsearch' {
 
     export interface SearchResult {
         field: string;
-        result: string[];
+        result: (string | number)[]; // FlexSearch Id type is string | number
     }
 
     export class Index {
@@ -28,11 +28,11 @@ declare module 'flexsearch' {
         remove(id: string | number): void;
     }
 
-    export class Document {
+    export class Document<T = object> {
         constructor(options?: IndexOptions);
-        add(doc: object): void;
+        add(doc: T): void;
         search(query: string, options?: SearchOptions): SearchResult[];
-        update(doc: object): void;
+        update(doc: T): void;
         remove(id: string | number): void;
     }
 }

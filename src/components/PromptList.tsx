@@ -9,7 +9,6 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { VariableInjector } from './VariableInjector';
 import { VersionHistory } from './VersionHistory';
-// @ts-expect-error: Standard react-window import
 import { FixedSizeList as List } from 'react-window';
 
 interface ListChildData<T = unknown> {
