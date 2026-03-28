@@ -6,13 +6,14 @@ interface StorageUsageProps {
 }
 
 /**
- * Component to display the estimated browser storage usage (localStorage).
- * Provides the user with a visual percentage bar and raw MB readout.
+ * Component to display the estimated browser storage usage.
+ * Uses the Storage Estimate API (IndexedDB + caches + SW) when available,
+ * falling back to a localStorage byte-count for older browsers.
  */
 export function StorageUsage({ promptsCount }: StorageUsageProps) {
-    const [usage, setUsage] = useState(0); // in bytes
+    const [usage, setUsage] = useState(0);  // in bytes
+    const [quota, setQuota] = useState(50 * 1024 * 1024); // fallback 50 MB
     const [isOnline, setIsOnline] = useState(navigator.onLine);
-    const LIMIT = 50 * 1024 * 1024; // Updated to 50MB for IndexedDB context (user threshold)
 
     useEffect(() => {
         const handleOnline = () => setIsOnline(true);
@@ -23,8 +24,10 @@ export function StorageUsage({ promptsCount }: StorageUsageProps) {
 
         const calculateUsage = async () => {
             if (navigator.storage && navigator.storage.estimate) {
-                const { usage: totalUsage } = await navigator.storage.estimate();
+                const { usage: totalUsage, quota: totalQuota } = await navigator.storage.estimate();
                 setUsage(totalUsage || 0);
+                // Use real browser quota so the bar reflects actual limits
+                if (totalQuota) setQuota(totalQuota);
             } else {
                 // Fallback for browsers that don't support the Estimate API yet
                 let total = 0;
@@ -52,12 +55,12 @@ export function StorageUsage({ promptsCount }: StorageUsageProps) {
     }, [promptsCount]);
 
     const percentage = useMemo(() => {
-        const p = (usage / LIMIT) * 100;
+        const p = (usage / quota) * 100;
         return Math.min(Math.max(p, 0), 100);
-    }, [usage, LIMIT]);
+    }, [usage, quota]);
 
     const usageMB = (usage / (1024 * 1024)).toFixed(2);
-    const limitMB = (LIMIT / (1024 * 1024)).toFixed(0);
+    const limitMB = (quota / (1024 * 1024)).toFixed(0);
 
     return (
         <div className="storage-usage-container" style={{ padding: '1rem', marginTop: 'auto' }}>
@@ -105,7 +108,7 @@ export function StorageUsage({ promptsCount }: StorageUsageProps) {
             </div>
             
             <div style={{ marginTop: '0.4rem', fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'right' }}>
-                {percentage.toFixed(1)}% of local quota used
+                {percentage.toFixed(1)}% of browser quota used
             </div>
         </div>
     );

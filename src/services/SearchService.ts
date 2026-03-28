@@ -61,6 +61,20 @@ class SearchService {
     }
 
     /**
+     * Returns true once the index has been populated for the first time.
+     */
+    public get isInitialized(): boolean {
+        return this.initialized;
+    }
+
+    /**
+     * Incrementally add a new prompt to the index.
+     */
+    public add(prompt: Prompt) {
+        this.index.add(prompt);
+    }
+
+    /**
      * Incrementally add or update a prompt in the index.
      */
     public update(prompt: Prompt) {
