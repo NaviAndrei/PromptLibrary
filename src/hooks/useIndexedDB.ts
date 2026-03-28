@@ -59,13 +59,10 @@ export function useIndexedDB<T>(storeName: string, initialValue: T[]) {
             // 1. Update In-Memory React State (fast UI feedback)
             setStoredValue(nextValue);
             
-            // 2. Perform Batch-Update or Clear-and-Replace in IDB (persistence)
-            await dbInstance.clear(storeName);
-            for (const item of nextValue) {
-                await dbInstance.put(storeName, item);
-            }
+            // 2. Perform Single Transactional Batch-Update (Fast & Reliable)
+            await dbInstance.putBatch(storeName, nextValue);
             
-            // 3. Dispatch global sync event for other components (including StorageUsage)
+            // 3. Dispatch global sync event for other components
             window.dispatchEvent(new Event('storage-sync'));
             
         } catch (error) {

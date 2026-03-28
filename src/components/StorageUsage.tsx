@@ -21,23 +21,26 @@ export function StorageUsage({ promptsCount }: StorageUsageProps) {
         window.addEventListener('online', handleOnline);
         window.addEventListener('offline', handleOffline);
 
-        const calculateUsage = () => {
-            let total = 0;
-            for (let i = 0; i < window.localStorage.length; i++) {
-                const key = window.localStorage.key(i);
-                if (key) {
-                    const value = window.localStorage.getItem(key);
-                    total += (key.length + (value ? value.length : 0)) * 2; // UTF-16 characters = 2 bytes each
+        const calculateUsage = async () => {
+            if (navigator.storage && navigator.storage.estimate) {
+                const { usage: totalUsage } = await navigator.storage.estimate();
+                setUsage(totalUsage || 0);
+            } else {
+                // Fallback for browsers that don't support the Estimate API yet
+                let total = 0;
+                for (let i = 0; i < window.localStorage.length; i++) {
+                    const key = window.localStorage.key(i);
+                    const val = key ? window.localStorage.getItem(key) : '';
+                    total += ((key?.length || 0) + (val?.length || 0)) * 2;
                 }
+                setUsage(total);
             }
-            setUsage(total);
         };
 
         calculateUsage();
         
-        // Listen for storage changes in other tabs
+        // Listen for storage changes in other tabs or through our custom sync event
         window.addEventListener('storage', calculateUsage);
-        // Custom listener for internal updates
         window.addEventListener('storage-sync', calculateUsage);
 
         return () => {

@@ -26,10 +26,10 @@ export function usePromptFilters(prompts: Prompt[], options: FilterOptions) {
 
         // Perform specialized Full-Text Search if query is present
         if (searchQuery.trim()) {
-            const matchedIds = searchService.search(searchQuery);
-            if (matchedIds.length > 0) {
-                // Intersect matches with the initial set
-                result = result.filter(p => matchedIds.includes(p.id));
+            const matchedIds = new Set(searchService.search(searchQuery));
+            if (matchedIds.size > 0) {
+                // Intersect matches with the initial set (O(1) lookup via Set)
+                result = result.filter(p => matchedIds.has(p.id));
             } else {
                 // Fallback to substring matching (for short queries FlexSearch might miss)
                 const lowerQuery = searchQuery.toLowerCase();

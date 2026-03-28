@@ -23,7 +23,7 @@ class SearchService {
     }
 
     /**
-     * Initializes or Re-builts the entire index from a fresh set of prompts.
+     * Rebuilds the entire index from a fresh set of prompts.
      */
     public initialize(prompts: Prompt[]) {
         if (this.initialized) {

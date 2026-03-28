@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import type { CSSProperties, ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import type { Prompt, PromptVersion, Workspace } from '../types';
 import { toast } from 'sonner';
 import { Edit2, Copy, Trash2, ChevronDown, ChevronUp, Download, Clock } from 'lucide-react';
@@ -9,7 +9,15 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { VariableInjector } from './VariableInjector';
 import { VersionHistory } from './VersionHistory';
-import { List } from 'react-window';
+// @ts-expect-error: Standard react-window import
+import { FixedSizeList as List } from 'react-window';
+
+interface ListChildData<T = unknown> {
+    index: number;
+    style: React.CSSProperties;
+    data: T;
+    isScrolling?: boolean;
+}
 
 // Sub-component for the top section of a prompt card
 interface PromptCardHeaderProps {
@@ -249,8 +257,8 @@ export function PromptList({ prompts, viewMode, onEdit, onDelete, getVersions, w
     const historyPrompt = historyPromptId ? prompts.find(p => p.id === historyPromptId) : null;
 
     // Rendering an individual row for virtualization (v2 API)
-    const PromptRow = ({ index, style }: { index: number, style: CSSProperties }): ReactElement | null => {
-        const prompt = prompts[index];
+    const PromptRow = ({ index, style, data }: ListChildData<Prompt[]>): ReactElement | null => {
+        const prompt = data[index];
         if (!prompt) return null;
         
         const isExpanded = expandedIds.has(prompt.id);
@@ -317,14 +325,15 @@ export function PromptList({ prompts, viewMode, onEdit, onDelete, getVersions, w
 
             {viewMode === 'list' && prompts.length > 5 ? (
                 <List
-                    style={{ height: '800px' }}
-                    rowCount={prompts.length}
-                    rowHeight={280}
-                    rowComponent={PromptRow}
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    rowProps={{} as any}
+                    height={800}
+                    width="100%"
+                    itemCount={prompts.length}
+                    itemSize={280}
+                    itemData={prompts}
                     className="prompt-list list virtualized"
-                />
+                >
+                    {PromptRow}
+                </List>
             ) : (
                 <div className={`prompt-list ${viewMode}`} id="prompt-list">
                     {prompts.map((_: Prompt, idx: number) => (
@@ -332,6 +341,7 @@ export function PromptList({ prompts, viewMode, onEdit, onDelete, getVersions, w
                             key={prompts[idx].id} 
                             index={idx} 
                             style={{ position: 'relative' }} 
+                            data={prompts}
                         />
                     ))}
                 </div>

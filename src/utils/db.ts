@@ -21,7 +21,8 @@ export class PromptDatabase {
                     db.createObjectStore('workspaces', { keyPath: 'id' });
                 }
                 if (!db.objectStoreNames.contains('history')) {
-                    db.createObjectStore('history', { keyPath: 'id' }); // id = promptId or specific version ID
+                    // Optimized to use compound keys: PromptVersion doesn't need an artificial 'id'
+                    db.createObjectStore('history', { keyPath: ['promptId', 'savedAt'] });
                 }
             };
 
@@ -40,8 +41,29 @@ export class PromptDatabase {
             const store = transaction.objectStore(storeName);
             const request = action(store);
 
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
+            // Ensure callers only proceed when the transaction is definitively committed
+            transaction.oncomplete = () => resolve(request.result);
+            transaction.onerror = () => reject(transaction.error);
+            transaction.onabort = () => reject(new Error('IndexedDB Transaction Aborted'));
+        });
+    }
+
+    /**
+     * Specialized batch operation to handle multiple writes in a single request transaction.
+     * Dramatically improves O(1) reactive write speed for large prompt datasets.
+     */
+    async putBatch<T>(storeName: string, data: T[]): Promise<void> {
+        const db = await this.getDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(storeName, 'readwrite');
+            const store = transaction.objectStore(storeName);
+
+            store.clear();
+            data.forEach(item => store.put(item));
+
+            transaction.oncomplete = () => resolve();
+            transaction.onerror = () => reject(transaction.error);
+            transaction.onabort = () => reject(new Error('IndexedDB Batch Put Aborted'));
         });
     }
 
