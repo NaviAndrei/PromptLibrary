@@ -26,3 +26,19 @@ export interface PromptVersion {
     savedAt: string;   // Timestamp of the saved version (ISO string)
     label?: string;    // Optional label provided by the user
 }
+
+// A reusable prompt template with predefined variables
+export interface PromptTemplate {
+    id: string;          // Unique identifier
+    name: string;        // Name of the template (e.g., "Code Review Fixer")
+    description: string; // Brief description of what this template is for
+    variables: string[]; // List of required variable names (e.g., ["code", "language"])
+    templateBody: string;// The base text with {{variables}}
+    category: string;    // Tagging category (e.g., "Development", "Writing")
+}
+
+// Filter range for date searches
+export interface DateRange {
+    start: Date | null;
+    end: Date | null;
+}

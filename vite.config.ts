@@ -1,30 +1,26 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
+// NOTE: vite-plugin-pwa@1.2.0 has a known incompatibility with Vite 8 (Rolldown).
+// PWA manifest is served via public/manifest.json instead until the plugin is updated.
 export default defineConfig({
   plugins: [
-    react(),
-    VitePWA({
-      registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg'],
-      manifest: {
-        name: 'Prompt Library',
-        short_name: 'Prompts',
-        description: 'A modern, sleek web application for managing AI prompts',
-        theme_color: '#1a1a2e',
-        background_color: '#1a1a2e',
-        display: 'standalone',
-        icons: [
-          {
-            src: 'favicon.svg',
-            sizes: '192x192 512x512',
-            type: 'image/svg+xml'
-          }
-        ]
-      }
-    })
+    react()
   ],
-  base: '/PromptLibrary/'
+  base: '/PromptLibrary/',
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            // Split node_modules into a separate vendor chunk
+            return 'vendor';
+          }
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000, // 1MB threshold for library components
+    sourcemap: true // Useful for debugging production issues
+  }
 })

@@ -3,26 +3,29 @@
 A professional, local-first **AI Prompt Management System** built for speed, organization, and portability.
 
 [![Deployment Status](https://github.com/NaviAndrei/PromptLibrary/actions/workflows/deploy.yml/badge.svg)](https://github.com/NaviAndrei/PromptLibrary/actions/workflows/deploy.yml)
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-1.2.5-blue.svg)](package.json)
 
 ## ✨ Features
 
-- **📂 Smart Workspaces**: Organize prompts into dedicated project folders with custom icons and colors.
+- **📂 Smart Workspaces**: Virtual folder organization for grouping related prompts.
+- **⚡ Full-Text Search**: High-performance local search across title, body, and tags (powered by **FlexSearch**).
 - **🌗 Dark Mode**: Premium dark/light themes that persist across sessions.
-- **🧩 Variable Injection**: Use `{{variable}}` syntax to create dynamic templates with live input fields.
-- **🕐 Version History**: Automatic snapshots of your prompts with a built-in visual code diff (LCS algorithm).
-- **☁️ Cloud Sync**: Bidirectional synchronization using GitHub Gists (Secret) – keeps your data private and mobile.
-- **📱 PWA Ready**: Install it as a desktop or mobile app for offline access.
-- **🏷️ Multi-Tag Autocomplete**: Smart tag suggestions even for multiple tag entries.
-- **🚀 Masonry Grid**: Optimized layout for wide screens (3+ columns).
+- **🧩 Variable Injection**: Use `{{variable}}` syntax with dynamic UI inputs.
+- **💄 Advanced Filtering**: Specific Model and Date-Range (inclusive) filters.
+- **🕐 Version History**: Automatic snapshots of your prompts with visual diffing.
+- **🏛️ IndexedDB**: Massive local capacity (hundreds of MBs) replacing the 5MB browser limit.
+- **📱 PWA v2 Native**: Full offline access with background asset caching and connectivity monitoring.
+- **🧼 Cleanup Assistant**: Identify and remove large, stale, or duplicate prompts.
 
 ## 🛠️ Tech Stack
 
-- **Core**: React 18 + TypeScript + Vite
-- **Styling**: Vanilla CSS (CSS Variables)
+- **Core**: React 19 + TypeScript 5.9 + Vite 8
+- **Storage**: IndexedDB (Primary) + LocalStorage (Settings)
+- **Search**: FlexSearch (In-Memory Engine)
+- **Styling**: Vanilla CSS (Global Variables)
 - **Icons**: Lucide React
-- **Storage**: LocalStorage + GitHub Gist API
 - **Formatting**: React Markdown + Syntax Highlighting (Prism)
+- **Security**: CodeQL Workflow Analysis
 
 ## 🚀 Getting Started
 

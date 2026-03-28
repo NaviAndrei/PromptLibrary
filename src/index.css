@@ -61,6 +61,19 @@ body {
   padding: 2rem 1rem;
 }
 
+/* Accessibility: visually hidden but available to screen readers */
+.hide-visually {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .header {
   margin-bottom: 2rem;
 }
@@ -283,6 +296,10 @@ button {
   box-shadow: var(--shadow-sm);
   position: sticky;
   top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: calc(100vh - 4rem);
 }
 
 .sidebar-header {
@@ -773,6 +790,66 @@ button {
   margin-bottom: 0.75rem;
 }
 
+.presets-section {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.preset-save-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.preset-input {
+  flex: 1;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--surface-color);
+  color: var(--text-dark);
+}
+
+.presets-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.preset-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  padding: 0.25rem 0.6rem;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-dark);
+}
+
+.preset-chip:hover {
+  border-color: var(--primary-color);
+  background: var(--bg-color);
+}
+
+.delete-icon {
+  color: var(--text-muted);
+  opacity: 0.5;
+  transition: all 0.2s;
+}
+
+.delete-icon:hover {
+  color: var(--danger-color);
+  opacity: 1;
+}
+
+
 .variable-inputs-grid {
   display: flex;
   flex-direction: column;
@@ -790,8 +867,20 @@ button {
   font-weight: 600;
   font-size: 0.85rem;
   color: var(--primary-color);
-  min-width: 120px;
+  min-width: 140px;
   margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.type-badge {
+  font-size: 0.7rem;
+  background: var(--border-color);
+  color: var(--text-muted);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-weight: normal;
 }
 
 .variable-label code {
@@ -820,6 +909,23 @@ button {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
+/* New styles for specific variable input types */
+.variable-input-number {
+  max-width: 120px;
+  text-align: center;
+  font-family: 'Consolas', monospace;
+  font-weight: 600;
+}
+
+.variable-input-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
+  appearance: none;
+}
+
 .variable-copy-btn {
   display: flex;
   align-items: center;
@@ -828,8 +934,24 @@ button {
   justify-content: center;
 }
 
+/* Drag and Drop Feedback */
+.workspace-item.drag-over {
+  background: var(--primary-color) !important;
+  color: white !important;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.prompt-card[draggable="true"] {
+  cursor: grab;
+}
+
+.prompt-card[draggable="true"]:active {
+  cursor: grabbing;
+}
+
 /* ==========================================
-   VERSION HISTORY & DIFF VIZUAL
+   VERSION HISTORY & DIFF VISUAL
    ========================================== */
 .version-history-modal {
   max-width: 700px;
@@ -873,7 +995,7 @@ button {
   color: var(--text-muted);
 }
 
-/* Block diff vizual linie-cu-linie */
+/* Line-by-line visual diff block */
 .diff-view {
   font-family: 'Consolas', 'Fira Code', monospace;
   font-size: 0.82rem;
