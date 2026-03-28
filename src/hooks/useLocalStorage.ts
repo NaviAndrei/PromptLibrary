@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 // Generic hook to store and read data from localStorage
 // Uses "lazy" initialization so JSON parsing only happens on the first render
@@ -53,8 +54,12 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
             
             // 2. Save it as a string to localStorage
             window.localStorage.setItem(key, JSON.stringify(valueToStore));
+
+            // 3. Dispatch a custom event to notify other components in the same tab (like StorageUsage)
+            window.dispatchEvent(new Event('storage-sync'));
         } catch (error) {
             console.error('Error saving to localStorage:', error);
+            toast.error('Failed to save data. Your browser storage might be full (QuotaExceededError).');
         }
     };
 

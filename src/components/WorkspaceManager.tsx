@@ -17,6 +17,8 @@ interface WorkspaceManagerProps {
     onSelect: (id: string | null) => void;
     onAdd: (ws: Workspace) => void;
     onDelete: (id: string) => void;
+    // Callback to move a prompt from one workspace to another
+    onMovePrompt?: (promptId: string, workspaceId: string | null) => void;
 }
 
 export function WorkspaceManager({
@@ -25,6 +27,7 @@ export function WorkspaceManager({
     onSelect,
     onAdd,
     onDelete,
+    onMovePrompt,
 }: WorkspaceManagerProps) {
     // Form state for creating new workspace
     const [isAdding, setIsAdding] = useState(false);
@@ -110,12 +113,21 @@ export function WorkspaceManager({
                 </div>
             )}
 
-            {/* List of existing workspaces */}
+            {/* List of existing workspaces (Drop Targets) */}
             <ul className="workspace-list" id="workspace-list">
                 {/* "All" option */}
                 <li
                     className={`workspace-item ${currentWorkspaceId === null ? 'active' : ''}`}
                     onClick={() => onSelect(null)}
+                    onDragOver={e => { e.preventDefault(); (e.currentTarget as HTMLElement).classList.add('drag-over'); }}
+                    onDragLeave={e => (e.currentTarget as HTMLElement).classList.remove('drag-over')}
+                    onDrop={e => {
+                        e.preventDefault();
+                        const target = e.currentTarget as HTMLElement;
+                        target.classList.remove('drag-over');
+                        const promptId = e.dataTransfer.getData('promptId');
+                        if (promptId && onMovePrompt) onMovePrompt(promptId, null);
+                    }}
                 >
                     <span>🗂️</span>
                     <span className="workspace-item-name">All Prompts</span>
@@ -126,6 +138,15 @@ export function WorkspaceManager({
                         key={ws.id}
                         className={`workspace-item ${currentWorkspaceId === ws.id ? 'active' : ''}`}
                         onClick={() => onSelect(ws.id)}
+                        onDragOver={e => { e.preventDefault(); (e.currentTarget as HTMLElement).classList.add('drag-over'); }}
+                        onDragLeave={e => (e.currentTarget as HTMLElement).classList.remove('drag-over')}
+                        onDrop={e => {
+                            e.preventDefault();
+                            const target = e.currentTarget as HTMLElement;
+                            target.classList.remove('drag-over');
+                            const promptId = e.dataTransfer.getData('promptId');
+                            if (promptId && onMovePrompt) onMovePrompt(promptId, ws.id);
+                        }}
                         style={{ borderLeft: `3px solid ${ws.color}` }}
                     >
                         <span>{ws.icon}</span>

@@ -7,32 +7,33 @@ import { PromptList } from './components/PromptList';
 import { Sidebar } from './components/Sidebar';
 import { DataActions } from './components/DataActions';
 import { WorkspaceManager } from './components/WorkspaceManager';
+import { TemplateManager } from './components/TemplateManager';
+import { StorageUsage } from './components/StorageUsage';
+import { CleanupAssistant } from './components/CleanupAssistant';
 import { Toaster, toast } from 'sonner';
 import { LayoutGrid, List, Moon, Sun } from 'lucide-react';
+import { usePromptFilters } from './hooks/usePromptFilters';
+import { useIndexedDB } from './hooks/useIndexedDB';
 
 function App() {
-    // Store prompts in localStorage
-    const [prompts, setPrompts] = useLocalStorage<Prompt[]>('prompts', []);
+    // Large Datasets use IndexedDB for unlimited capacity
+    const [prompts, setPrompts] = useIndexedDB<Prompt>('prompts', []);
+    const [workspaces, setWorkspaces] = useIndexedDB<Workspace>('workspaces', []);
+    const [promptHistory, setPromptHistory] = useIndexedDB<PromptVersion>('history', []);
 
-    // Store workspaces in localStorage
-    const [workspaces, setWorkspaces] = useLocalStorage<Workspace[]>('workspaces', []);
-
-    // Store version history in localStorage (indexed by promptId)
-    const [promptHistory, setPromptHistory] = useLocalStorage<PromptVersion[]>('prompt-history', []);
-
-    // Current selected workspace (null = all prompts)
-    const [currentWorkspaceId, setCurrentWorkspaceId] = useState<string | null>(null);
-
-    // Store search query from SearchBar
+    // Lightweight UI settings continue to use localStorage for instant initialization
+    const [currentWorkspaceId, setCurrentWorkspaceId] = useLocalStorage<string | null>('current-workspace', null);
     const [searchQuery, setSearchQuery] = useState('');
-
-    // Store prompt currently being edited
-    const [editingPrompt, setEditingPrompt] = useState<Prompt | null>(null);
-
-    // UI state
-    const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
-    const [selectedTag, setSelectedTag] = useState<string | null>(null);
     const [theme, setTheme] = useLocalStorage<'light' | 'dark'>('theme', 'light');
+    const [viewMode, setViewMode] = useLocalStorage<'list' | 'grid'>('view-mode', 'grid');
+
+    // UI State for editing and filtering (ephemeral)
+    const [editingPrompt, setEditingPrompt] = useState<Prompt | null>(null);
+    const [selectedTag, setSelectedTag] = useState<string | null>(null);
+
+    // Advanced search filters
+    const [selectedModel, setSelectedModel] = useState<string | null>(null);
+    const [dateRange, setDateRange] = useState<{ start: Date | null, end: Date | null }>({ start: null, end: null });
 
     // Apply global theme to the HTML tag
     useEffect(() => {
@@ -48,33 +49,20 @@ function App() {
         return Object.entries(counts).sort((a, b) => b[1] - a[1]);
     }, [prompts]);
 
-    // Search and filtering (including workspace)
-    const filteredPrompts = useMemo(() => {
-        let result = prompts;
+    // Compute all unique AI models for filtering
+    const allModels = useMemo(() => {
+        const models = new Set(prompts.map(p => p.model));
+        return Array.from(models).sort();
+    }, [prompts]);
 
-        // Filter by selected workspace
-        if (currentWorkspaceId) {
-            result = result.filter(p => p.workspaceId === currentWorkspaceId);
-        }
-
-        // Filter by selected tag
-        if (selectedTag) {
-            result = result.filter(p => p.tags.includes(selectedTag));
-        }
-
-        // Filter by search text
-        if (searchQuery.trim()) {
-            const lowerQuery = searchQuery.toLowerCase();
-            result = result.filter(p => {
-                const matchesTitle = p.title.toLowerCase().includes(lowerQuery);
-                const matchesBody = p.body.toLowerCase().includes(lowerQuery);
-                const matchesTags = p.tags.some(tag => tag.toLowerCase().includes(lowerQuery));
-                return matchesTitle || matchesBody || matchesTags;
-            });
-        }
-
-        return result;
-    }, [prompts, searchQuery, selectedTag, currentWorkspaceId]);
+    // Encapsulated data filtering logic using custom hook
+    const filteredPrompts = usePromptFilters(prompts, {
+        searchQuery,
+        selectedTag,
+        currentWorkspaceId,
+        selectedModel,
+        dateRange
+    });
 
     // Handler for Create or Update save
     const handleSavePrompt = (promptData: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -156,6 +144,24 @@ function App() {
         toast.info('Workspace deleted.');
     };
 
+    // Move a prompt from one workspace to another (Drag-and-Drop)
+    const handleMovePromptToWorkspace = (promptId: string, workspaceId: string | null) => {
+        const targetPrompt = prompts.find(p => p.id === promptId);
+        if (!targetPrompt) return;
+
+        // Do nothing if the prompt is already in the target workspace
+        if (targetPrompt.workspaceId === (workspaceId || undefined)) return;
+
+        const updatedPrompts = prompts.map(p => 
+            p.id === promptId ? { ...p, workspaceId: workspaceId || undefined, updatedAt: new Date().toISOString() } : p
+        );
+        
+        setPrompts(updatedPrompts);
+        
+        const wsName = workspaceId ? workspaces.find(w => w.id === workspaceId)?.name : 'All Prompts';
+        toast.success(`Prompt "${targetPrompt.title}" moved to ${wsName}`);
+    };
+
     // Get versions for a specific prompt
     const getVersionsForPrompt = (promptId: string): PromptVersion[] => {
         return promptHistory.filter(v => v.promptId === promptId);
@@ -191,13 +197,31 @@ function App() {
                         onSelect={setCurrentWorkspaceId}
                         onAdd={handleAddWorkspace}
                         onDelete={handleDeleteWorkspace}
+                        onMovePrompt={handleMovePromptToWorkspace}
                     />
                     <div className="sidebar-divider" />
                     <Sidebar tags={allTags} selectedTag={selectedTag} onSelectTag={setSelectedTag} />
+                    <div className="sidebar-divider" />
+                    <TemplateManager 
+                        onSelectTemplate={(template) => {
+                            setEditingPrompt({
+                                id: '', // Mark as new for handleSavePrompt
+                                title: template.name,
+                                body: template.templateBody,
+                                tags: [template.category],
+                                model: 'Choose AI Model', // Default placeholder
+                                createdAt: new Date().toISOString(),
+                                updatedAt: new Date().toISOString(),
+                            });
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }} 
+                    />
+                    <CleanupAssistant prompts={prompts} onDelete={handleDeletePrompt} />
+                    <StorageUsage promptsCount={prompts.length} />
                 </aside>
 
                 <main className="main-content">
-                    <div className="search-row" style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', alignItems: 'center' }}>
+                    <div className="search-row" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
                         <div style={{ flex: 1 }}>
                             <SearchBar
                                 searchQuery={searchQuery}
@@ -220,6 +244,49 @@ function App() {
                                 <List size={20} />
                             </button>
                         </div>
+                    </div>
+
+                    {/* Advanced Filter Bar */}
+                    <div className="filter-bar" style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                        <select 
+                            className="workspace-select" 
+                            style={{ flex: 1, minWidth: '150px' }}
+                            value={selectedModel || ''} 
+                            onChange={e => setSelectedModel(e.target.value || null)}
+                        >
+                            <option value="">All Models</option>
+                            {allModels.map(m => <option key={m} value={m}>{m}</option>)}
+                        </select>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 2 }}>
+                            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>From:</label>
+                            <input 
+                                type="date" 
+                                className="workspace-name-input" 
+                                style={{ flex: 1 }}
+                                onChange={e => setDateRange(prev => ({ ...prev, start: e.target.value ? new Date(e.target.value) : null }))}
+                            />
+                            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>To:</label>
+                            <input 
+                                type="date" 
+                                className="workspace-name-input" 
+                                style={{ flex: 1 }}
+                                onChange={e => setDateRange(prev => ({ ...prev, end: e.target.value ? new Date(e.target.value) : null }))}
+                            />
+                        </div>
+
+                        {(selectedModel || dateRange.start || dateRange.end) && (
+                            <button 
+                                className="btn-secondary" 
+                                style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
+                                onClick={() => {
+                                    setSelectedModel(null);
+                                    setDateRange({ start: null, end: null });
+                                }}
+                            >
+                                Clear Filters
+                            </button>
+                        )}
                     </div>
 
                     <PromptForm

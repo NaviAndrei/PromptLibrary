@@ -8,11 +8,26 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: 'auto',
       includeAssets: ['favicon.svg'],
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-cache',
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 203] }
+            }
+          }
+        ]
+      },
       manifest: {
-        name: 'Prompt Library',
-        short_name: 'Prompts',
-        description: 'A modern, sleek web application for managing AI prompts',
+        name: 'Prompt Library v2',
+        short_name: 'Prompts Pro',
+        description: 'Advanced AI prompt library with IndexedDB and PWA offline-sync.',
         theme_color: '#1a1a2e',
         background_color: '#1a1a2e',
         display: 'standalone',
@@ -26,5 +41,19 @@ export default defineConfig({
       }
     })
   ],
-  base: '/PromptLibrary/'
+  base: '/PromptLibrary/',
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            // Split node_modules into a separate vendor chunk
+            return 'vendor';
+          }
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000, // 1MB threshold for library components
+    sourcemap: true // Useful for debugging production issues
+  }
 })
