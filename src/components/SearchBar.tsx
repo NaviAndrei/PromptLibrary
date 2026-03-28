@@ -5,15 +5,15 @@ interface SearchBarProps {
     onSearchChange: (query: string) => void;
 }
 
-// Componentă pentru bara de căutare
-// Primește interogarea și funcția de actualizare ca props pentru a fi un component controlat
+// Search bar component
+// Receives the query and update function as props to be a controlled component
 export function SearchBar({ searchQuery, onSearchChange }: SearchBarProps) {
     return (
         <div className="search-container">
             <input
                 type="text"
                 className="search-input"
-                placeholder="Caută în titlu, tag-uri sau conținut..."
+                placeholder="Search by title, tags, or content..."
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
             />
