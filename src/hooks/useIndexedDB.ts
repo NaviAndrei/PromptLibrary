@@ -56,7 +56,7 @@ export function useIndexedDB<T>(storeName: string, initialValue: T[], legacyKey?
         };
 
         loadAndMigrate();
-    }, [storeName]);
+    }, [storeName, legacyKey]);
 
     /**
      * Specialized "Save" function that handles IndexedDB persistence
