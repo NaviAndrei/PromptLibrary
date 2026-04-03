@@ -3,15 +3,20 @@
 A professional, local-first **AI Prompt Management System** built for speed, organization, and portability.
 
 [![Deployment Status](https://github.com/NaviAndrei/PromptLibrary/actions/workflows/deploy.yml/badge.svg)](https://github.com/NaviAndrei/PromptLibrary/actions/workflows/deploy.yml)
-[![Version](https://img.shields.io/badge/version-1.2.5-blue.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](package.json)
 
 ## ✨ Features
 
 - **📂 Smart Workspaces**: Virtual folder organization for grouping related prompts.
+- **🎛️ Unified Control Bar**: Search, view toggles, model filters, and date range live together in one compact header.
 - **⚡ Full-Text Search**: High-performance local search across title, body, and tags (powered by **FlexSearch**).
+- **🧭 Sidebar Polish**: Helpful section notes, clearer dividers, and an inset scrollbar keep the left panel readable.
+- **🏷️ Sidebar-Driven Tags**: The Add New Prompt form suggests tags from the sidebar cloud and supports comma-separated multi-tag entry.
+- **🗂️ Prompt Templates**: Reusable templates can be edited in a modal and added as prompts with one click.
 - **🌗 Dark Mode**: Premium dark/light themes that persist across sessions.
 - **🧩 Variable Injection**: Use `{{variable}}` syntax with dynamic UI inputs.
 - **💄 Advanced Filtering**: Specific Model and Date-Range (inclusive) filters.
+- **📝 Plain-Text Prompt View**: Expanded prompt content stays selectable for easier copy and reuse.
 - **🕐 Version History**: Automatic snapshots of your prompts with visual diffing.
 - **🏛️ IndexedDB**: Massive local capacity (hundreds of MBs) replacing the 5MB browser limit.
 - **📱 PWA v2 Native**: Full offline access with background asset caching and connectivity monitoring.
@@ -22,9 +27,8 @@ A professional, local-first **AI Prompt Management System** built for speed, org
 - **Core**: React 19 + TypeScript 5.9 + Vite 8
 - **Storage**: IndexedDB (Primary) + LocalStorage (Settings)
 - **Search**: FlexSearch (In-Memory Engine)
-- **Styling**: Vanilla CSS (Global Variables)
+- **Styling**: Vanilla CSS (Global Variables + responsive shells)
 - **Icons**: Lucide React
-- **Formatting**: React Markdown + Syntax Highlighting (Prism)
 - **Security**: CodeQL Workflow Analysis
 
 ## 🚀 Getting Started
