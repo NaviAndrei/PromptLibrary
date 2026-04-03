@@ -3,7 +3,7 @@
 A professional, local-first **AI Prompt Management System** built for speed, organization, and portability.
 
 [![Deployment Status](https://github.com/NaviAndrei/PromptLibrary/actions/workflows/deploy.yml/badge.svg)](https://github.com/NaviAndrei/PromptLibrary/actions/workflows/deploy.yml)
-[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-1.3.1-blue.svg)](package.json)
 
 ## ✨ Features
 
@@ -34,17 +34,20 @@ A professional, local-first **AI Prompt Management System** built for speed, org
 ## 🚀 Getting Started
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/NaviAndrei/PromptLibrary.git
    cd PromptLibrary
    ```
 
 2. **Install dependencies**:
+
    ```bash
    npm install
    ```
 
 3. **Run in development mode**:
+
    ```bash
    npm run dev
    ```
@@ -65,4 +68,5 @@ The project is automatically deployed to **GitHub Pages** via GitHub Actions on 
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
+
 Built with ❤️ by **NaviAndrei**
