@@ -45,8 +45,8 @@ export function TemplateManager({ onSelectTemplate }: TemplateManagerProps) {
             return;
         }
 
-        // Simple regex to extract variables from the template body
-        const variables = Array.from(form.templateBody.matchAll(/\{\{(\w+)(?::\w+)?(?::[^}]+)?\}\}/g)).map(m => m[1]);
+        // Permissive regex to extract variables from the template body (supporting {{var}}, {{var=hint}}, {{var:type}})
+        const variables = Array.from(form.templateBody.matchAll(/\{\{([\w\s-]+)(?:[:=][^}]+)?\}\}/g)).map(m => m[1].trim());
         
         const newTemplate: PromptTemplate = {
             id: crypto.randomUUID(),
