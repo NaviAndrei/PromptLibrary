@@ -34,18 +34,31 @@ const TYPE_MAP: Record<string, string> = {
 
 // Detects all unique variables of type {{name:type:options}} from text
 function extractVariables(text: string): (VariableInfo & { options?: string[] })[] {
-    const regex = /\{\{(\w+)(?::(\w+))?(?::([^}]+))?\}\}/g;
+    // Permissive regex to support {{var}}, {{var:type}}, {{var:select:a,b}}, and {{var=hint}}
+    const regex = /\{\{([\w\s-]+)(?:[:=]([^}]+))?\}\}/g;
     const seen = new Set<string>();
     const variables: (VariableInfo & { options?: string[] })[] = [];
     
     let match;
     while ((match = regex.exec(text)) !== null) {
-        const name = match[1];
-        const typeHint = (match[2] || 'text').toLowerCase();
-        const optionsRaw = match[3];
+        const name = match[1].trim();
+        const fullHint = (match[2] || '').trim();
         
         if (!seen.has(name)) {
             seen.add(name);
+            
+            // Extract type and options if colon syntax is used
+            let typeHint = 'text';
+            let optionsRaw = '';
+            
+            if (fullHint.includes(':')) {
+                const parts = fullHint.split(':');
+                typeHint = parts[0].toLowerCase();
+                optionsRaw = parts.slice(1).join(':');
+            } else if (fullHint && !fullHint.includes('=') && TYPE_MAP[fullHint.toLowerCase()]) {
+                // If it's a recognized type (e.g. {{date:date}}), use it
+                typeHint = fullHint.toLowerCase();
+            }
             const info: VariableInfo & { options?: string[] } = {
                 name,
                 type: TYPE_MAP[typeHint] || 'text',
@@ -62,10 +75,13 @@ function extractVariables(text: string): (VariableInfo & { options?: string[] })
     return variables;
 }
 
-// Replaces all occurrences of {{variable}} or {{variable:type}} with the corresponding value
 function injectVariables(text: string, values: Record<string, string>): string {
-    return text.replace(/\{\{(\w+)(?::(\w+))?(?::([^}]+))?\}\}/g, (_, name) => {
-        return values[name] !== undefined && values[name] !== '' ? values[name] : `{{${name}}}`;
+    const regex = /\{\{([\w\s-]+)(?:[:=]([^}]+))?\}\}/g;
+    return text.replace(regex, (fullMatch, name) => {
+        const trimmedName = name.trim();
+        return values[trimmedName] !== undefined && values[trimmedName] !== '' 
+            ? values[trimmedName] 
+            : fullMatch;
     });
 }
 
