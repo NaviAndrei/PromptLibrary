@@ -70,20 +70,24 @@ export function StorageUsage({ promptsCount }: StorageUsageProps) {
                     Storage Usage
                 </span>
                 
-                {/* Online/Offline Badge */}
                 <div style={{ 
                     marginLeft: 'auto', 
                     display: 'flex', 
                     alignItems: 'center', 
                     gap: '4px',
                     fontSize: '0.7rem',
-                    padding: '2px 6px',
-                    borderRadius: '10px',
-                    background: isOnline ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    padding: '2px 8px',
+                    borderRadius: '12px',
+                    background: isOnline ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
                     color: isOnline ? '#22c55e' : '#ef4444',
-                    fontWeight: 600
+                    fontWeight: 700,
+                    border: `1px solid ${isOnline ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`,
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
                 }}>
-                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }} />
+                    <div 
+                        className={isOnline ? 'status-dot-pulse' : ''}
+                        style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }} 
+                    />
                     {isOnline ? 'ONLINE' : 'OFFLINE'}
                 </div>
             </div>
@@ -99,12 +103,15 @@ export function StorageUsage({ promptsCount }: StorageUsageProps) {
                 overflow: 'hidden',
                 border: '1px solid var(--border-color)'
             }}>
-                <div className="storage-progress-fill" style={{ 
-                    height: '100%', 
-                    width: `${percentage}%`,
-                    background: percentage > 80 ? 'var(--danger-color)' : percentage > 50 ? '#f59e0b' : 'var(--primary-color)',
-                    transition: 'width 0.3s ease'
-                }} />
+                <div 
+                    className="storage-progress-fill storage-progress-fill-animated" 
+                    style={{ 
+                        height: '100%', 
+                        width: `${percentage}%`,
+                        background: percentage > 80 ? 'var(--danger-color)' : percentage > 50 ? '#f59e0b' : 'var(--primary-color)',
+                        transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
+                    }} 
+                />
             </div>
             
             <div style={{ marginTop: '0.4rem', fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'right' }}>

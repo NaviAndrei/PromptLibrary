@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Prompt, Workspace } from '../types';
+import { LLM_MODELS } from '../constants';
 
 interface PromptFormProps {
     onSave: (prompt: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -16,7 +17,7 @@ export function PromptForm({ onSave, editingPrompt, existingTags, onClear, works
     const [title, setTitle] = useState(editingPrompt?.title || '');
     const [body, setBody] = useState(editingPrompt?.body || '');
     const [tagsInput, setTagsInput] = useState(editingPrompt ? editingPrompt.tags.join(', ') : '');
-    const [model, setModel] = useState(editingPrompt?.model || 'GPT-4o');
+    const [model, setModel] = useState(editingPrompt?.model || LLM_MODELS[0]);
     // Selected workspace in the form (defaults to current or prompt's workspace)
     const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(
         editingPrompt?.workspaceId ?? currentWorkspaceId ?? ''
@@ -26,7 +27,7 @@ export function PromptForm({ onSave, editingPrompt, existingTags, onClear, works
         setTitle('');
         setBody('');
         setTagsInput('');
-        setModel('GPT-4o');
+        setModel(LLM_MODELS[0]);
         setSelectedWorkspaceId(currentWorkspaceId ?? '');
     };
 
@@ -50,7 +51,7 @@ export function PromptForm({ onSave, editingPrompt, existingTags, onClear, works
             title: title.trim(),
             body: body.trim(),
             tags: tagsArray,
-            model: model.trim() || 'Generic',
+            model: model || LLM_MODELS[0],
             workspaceId: selectedWorkspaceId || undefined,
         });
 
@@ -108,12 +109,18 @@ export function PromptForm({ onSave, editingPrompt, existingTags, onClear, works
                 </div>
                 <div className="flex-1">
                     <label>Recommended Model:</label>
-                    <input
-                        type="text"
+                    <select
                         value={model}
                         onChange={e => setModel(e.target.value)}
-                        placeholder="e.g., Claude 3.5 Sonnet"
-                    />
+                        className="model-select"
+                    >
+                        {LLM_MODELS.map(m => (
+                            <option key={m} value={m}>{m}</option>
+                        ))}
+                        {!LLM_MODELS.includes(model) && model && (
+                            <option value={model}>{model} (Current)</option>
+                        )}
+                    </select>
                 </div>
             </div>
 
