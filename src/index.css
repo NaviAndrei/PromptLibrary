@@ -1,6 +1,7 @@
 /* Modern and Minimal CSS for Prompt Library */
 
-:root, [data-theme="light"] {
+:root,
+[data-theme="light"] {
   /* Light-Premium Color Palette */
   --bg-color: #f8fafc;
   --surface-color: #ffffff;
@@ -35,17 +36,26 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
   line-height: 1.5;
   color: var(--text-dark);
   background-color: var(--bg-color);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
 
 /* Base Reset */
 * {
@@ -190,7 +200,8 @@ body {
   gap: 0.6rem;
 }
 
-.minimal-select, .minimal-date {
+.minimal-select,
+.minimal-date {
   background: var(--bg-color);
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -201,7 +212,8 @@ body {
   transition: all 0.2s;
 }
 
-.minimal-select:hover, .minimal-date:hover {
+.minimal-select:hover,
+.minimal-date:hover {
   border-color: var(--primary-color);
 }
 
@@ -229,7 +241,9 @@ body {
   border-radius: 16px;
   background: var(--surface-color);
   border: 1px solid var(--border-color);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .prompt-card:hover {
@@ -282,9 +296,36 @@ body {
   background: var(--bg-color);
   padding: 1rem;
   border-radius: 8px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 0.9rem;
   line-height: 1.6;
+}
+
+/* 🖋️ Markdown Content Standard Padding & Font */
+.markdown-body {
+  font-size: 0.9rem !important;
+  line-height: 1.6 !important;
+  color: var(--text-dark);
+  background: var(--bg-color);
+  padding: 1rem;
+  border-radius: 8px;
+  font-family: "Inter", sans-serif !important;
+}
+
+.markdown-body p,
+.markdown-body ul,
+.markdown-body ol {
+  margin-bottom: 1rem;
+  font-weight: 400 !important; /* Force normal weight to avoid "bold" text issue */
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: var(--primary-color);
 }
 
 /* Search bar and Inputs Consistency */
@@ -363,7 +404,9 @@ label {
   font-size: 0.95rem;
 }
 
-input[type="text"], input[type="date"], textarea {
+input[type="text"],
+input[type="date"],
+textarea {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid var(--border-color);
@@ -400,7 +443,9 @@ input[type="date"]:hover::-webkit-calendar-picker-indicator {
   background: rgba(59, 130, 246, 0.1);
 }
 
-input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
+input[type="text"]:focus,
+input[type="date"]:focus,
+textarea:focus {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
   transform: translateY(-1px);
@@ -565,20 +610,29 @@ button {
   background-color: var(--text-muted);
 }
 
-.tags-list li, .workspace-item {
+.tags-list li,
+.workspace-item {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
 
-.tags-list li:hover, .workspace-item:hover {
+.tags-list li:hover,
+.workspace-item:hover {
   transform: translateX(6px);
   background: rgba(59, 130, 246, 0.08);
 }
 
 @keyframes storagePulse {
-  0% { opacity: 0.8; }
-  50% { opacity: 1; filter: brightness(1.1); }
-  100% { opacity: 0.8; }
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.1);
+  }
+  100% {
+    opacity: 0.8;
+  }
 }
 
 .storage-progress-fill-animated {
@@ -586,9 +640,18 @@ button {
 }
 
 @keyframes onlinePulse {
-  0% { transform: scale(1); opacity: 0.7; }
-  50% { transform: scale(1.4); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.7; }
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
 }
 
 .status-dot-pulse {
@@ -641,7 +704,9 @@ button {
   color: white;
 }
 
-.tag-name { font-weight: 500; }
+.tag-name {
+  font-weight: 500;
+}
 .tag-count {
   font-size: 0.75rem;
   background: var(--border-color);
@@ -656,8 +721,13 @@ button {
 }
 
 @media (max-width: 768px) {
-  .app-layout { flex-direction: column; }
-  .sidebar { width: 100%; position: static; }
+  .app-layout {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    position: static;
+  }
 }
 
 /* Prompt List and Elements */
@@ -756,7 +826,7 @@ button {
 }
 
 .prompt-body-preview pre.collapsed {
-  font-family: 'Consolas', monospace;
+  font-family: "Consolas", monospace;
   font-size: 0.9rem;
   color: var(--text-dark);
   white-space: pre-wrap;
@@ -797,8 +867,11 @@ button {
 /* Modals */
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -864,7 +937,8 @@ button {
 .markdown-body p:last-child {
   margin-bottom: 0;
 }
-.markdown-body ul, .markdown-body ol {
+.markdown-body ul,
+.markdown-body ol {
   margin-bottom: 1rem;
   padding-left: 1.5rem;
 }
@@ -878,7 +952,7 @@ button {
   background: var(--border-color);
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
-  font-family: 'Consolas', monospace;
+  font-family: "Consolas", monospace;
   font-size: 0.85em;
 }
 .markdown-body > div {
@@ -1044,7 +1118,8 @@ button {
 }
 
 /* Workspace selector in the form */
-.workspace-select, .model-select {
+.workspace-select,
+.model-select {
   width: 100%;
   padding: 0.75rem;
   background-color: var(--surface-color);
@@ -1061,7 +1136,11 @@ button {
 .variable-injector {
   margin-top: 1rem;
   padding: 1rem;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.08));
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.08),
+    rgba(139, 92, 246, 0.08)
+  );
   border: 1px solid rgba(59, 130, 246, 0.25);
   border-radius: var(--radius-md);
 }
@@ -1135,7 +1214,6 @@ button {
   opacity: 1;
 }
 
-
 .variable-inputs-grid {
   display: flex;
   flex-direction: column;
@@ -1199,7 +1277,7 @@ button {
 .variable-input-number {
   max-width: 120px;
   text-align: center;
-  font-family: 'Consolas', monospace;
+  font-family: "Consolas", monospace;
   font-weight: 600;
 }
 
@@ -1283,7 +1361,7 @@ button {
 
 /* Line-by-line visual diff block */
 .diff-view {
-  font-family: 'Consolas', 'Fira Code', monospace;
+  font-family: "Consolas", "Fira Code", monospace;
   font-size: 0.82rem;
   line-height: 1.6;
   overflow-x: auto;
@@ -1320,11 +1398,16 @@ button {
   min-width: 12px;
 }
 
-.diff-line.diff-added .diff-marker { color: #10b981; }
-.diff-line.diff-removed .diff-marker { color: #ef4444; }
-.diff-line.diff-equal .diff-marker { color: var(--border-color); }
+.diff-line.diff-added .diff-marker {
+  color: #10b981;
+}
+.diff-line.diff-removed .diff-marker {
+  color: #ef4444;
+}
+.diff-line.diff-equal .diff-marker {
+  color: var(--border-color);
+}
 
 .diff-text {
   flex: 1;
 }
-
