@@ -2,7 +2,7 @@
   "name": "prompt-library",
   "private": false,
   "description": "A modern, sleek web application for managing AI prompts. Built with React, TypeScript, and Vite.",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "author": "Ivan Andrei (NaviAndrei)",
   "license": "MIT",
   "type": "module",
