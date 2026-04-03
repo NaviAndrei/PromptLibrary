@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.6] - 2026-04-03
+
+### Fixed 🛠️
+- Imbunătățit regex-ul din `VariableInjector` și `TemplateManager` pentru a detecta impecabil variabile cu sintaxă complexă (ex: `{{VAR=hint cu caractere speciale}}`).
+- Rezolvat conflictele de compilare (Vite 8 Rolldown) și fixat tipabilitățile TypeScript din zona de căutare hibridă FlexSearch.
+- Fixat dependențele peer conflictuale la integrarea modulului `vite-plugin-pwa` offline.
+- Adăugat suport pentru persistența datelor migratoare `prompt-history` printr-un fix minor de compatibilitate pentru hook-urile React (`useIndexedDB`).
+
 ## [1.2.5] - 2026-03-28
 
 ### Added 🚀
