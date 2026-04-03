@@ -11,6 +11,7 @@ interface VariableInfo {
     name: string;
     type: string;
     raw: string;
+    hint?: string;
 }
 
 interface VariablePreset {
@@ -63,6 +64,7 @@ function extractVariables(text: string): (VariableInfo & { options?: string[] })
                 name,
                 type: TYPE_MAP[typeHint] || 'text',
                 raw: match[0],
+                hint: fullHint && !TYPE_MAP[fullHint.toLowerCase()] && !fullHint.includes(':') ? fullHint : undefined,
             };
             
             if (typeHint === 'select' && optionsRaw) {
@@ -203,7 +205,7 @@ export function VariableInjector({ body }: VariableInjectorProps) {
                             <input
                                 type={v.type}
                                 className={`variable-input ${v.type === 'number' ? 'variable-input-number' : ''}`}
-                                placeholder={`Value for ${v.name}`}
+                                placeholder={v.hint || `Value for ${v.name}`}
                                 value={values[v.name] || ''}
                                 onChange={e => handleChange(v.name, e.target.value)}
                                 aria-label={`Enter value for variable ${v.name}`}
