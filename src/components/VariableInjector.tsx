@@ -59,7 +59,6 @@ function extractVariables(text: string): (VariableInfo & { options?: string[] })
                 // If it's a recognized type (e.g. {{date:date}}), use it
                 typeHint = fullHint.toLowerCase();
             }
-            
             const info: VariableInfo & { options?: string[] } = {
                 name,
                 type: TYPE_MAP[typeHint] || 'text',
