@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-04-03
+### Added
+- **2026 LLM Models**: Support for 25+ next-gen models including GPT-5.4, Claude 4.6, Gemini 3.1, and Llama 4.
+- **Unified Control Bar**: Compact, horizontal layout combining search, model filters, and date range.
+- **View Mode Toggle**: Clear, premium buttons for switching between Grid and List views.
+- **Global Constants**: Unified `constants.ts` for managing LLM models across the app.
+- **Independent Card Height**: Improved grid layout where expanding one card doesn't stretch others in the same row.
+- **Hover Micro-interactions**: Added subtle "lift-up" translate and shadow effect on cards.
+
+### Fixed
+- **Variable Detection**: Enhanced regex support for hints and placeholders `{{name:hint}}`.
+- **Search Bar Contrast**: Fixed dark mode visibility and icon alignment issues.
+- **Date Filter UX**: Improved contrast and focus states for consistent theme-aware filtering.
+
 ## [1.2.8] - 2026-04-03
 
 ### Changed 🎨
