@@ -26,6 +26,9 @@ dist-ssr
 .specstory/
 .vscode/
 .github/
+git_workflow_guide.md
+.claude/
+docs/
 
 # --- Dependencies ---
 node_modules/
