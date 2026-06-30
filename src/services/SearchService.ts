@@ -43,7 +43,6 @@ class SearchService {
 
         prompts.forEach(p => this.index.add(p));
         this.initialized = true;
-        console.log(`[Search] Search index initialized with ${prompts.length} prompts.`);
     }
 
     private rebuild(prompts: Prompt[]) {
@@ -57,7 +56,6 @@ class SearchService {
             }
         });
         prompts.forEach(p => this.index.add(p));
-        console.log(`[Search] Search index rebuilt with ${prompts.length} prompts.`);
     }
 
     /**

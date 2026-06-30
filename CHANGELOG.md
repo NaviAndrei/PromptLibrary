@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Security
+
+- **Import hardening**: JSON and Gist imports now validate and normalize every record (id/title/body required; `tags` coerced to an array, `model` defaulted, unknown fields dropped), so a malformed or hand-crafted backup can no longer crash the app or persist corrupt data.
+- **Non-destructive import**: Importing now merges by ID by default (with an explicit Replace option) instead of silently overwriting the entire library.
+- **Token controls**: Added a "Forget Token" action to clear the GitHub PAT and Gist ID from the browser.
+- **Build/deploy**: Stopped publishing production source maps to the public site, removed unused dependencies, and patched the build toolchain (0 known vulnerabilities).
+
+### Fixed
+
+- **Reset Filters**: Now clears the From/To date pickers, which were uncontrolled and visually retained their values. Also fixed a timezone off-by-one in date filtering.
+- **Version history**: Snapshots that share a timestamp no longer overwrite each other — each snapshot has a unique ID (IndexedDB schema migrated to v2, preserving existing history).
+- **List view**: Expanding a prompt no longer clips or overlaps neighboring cards.
+- **Templates**: "Add as Prompt" now closes and resets the template modal.
+- **Form validation**: Replaced the blocking `alert()` with a toast notification.
+
+### Changed
+
+- Removed list virtualization (`react-window`); List and Grid now render consistently.
+- Added an accessible label to the theme toggle.
+- Removed leftover debug `console.log` statements.
+
+### Removed
+
+- Unused dependencies: `react-markdown`, `react-syntax-highlighter`, `remark-gfm`, `react-datepicker`, `react-window`, `vite-plugin-pwa`, and their related `@types` packages.
+
 ## 1.3.1
 
 ### Added

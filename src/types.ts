@@ -21,6 +21,7 @@ export interface Workspace {
 
 // A saved version of a prompt body, created on every edit
 export interface PromptVersion {
+    id: string;        // Unique snapshot id (UUID) — primary key in IndexedDB
     promptId: string;  // ID of the prompt it belongs to
     body: string;      // The text body at the time of the snapshot
     savedAt: string;   // Timestamp of the saved version (ISO string)

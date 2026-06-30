@@ -122,6 +122,7 @@ export function TemplateManager({ onAddAsPrompt }: TemplateManagerProps) {
     onAddAsPrompt(
       buildTemplateFromForm(editingTemplateId ?? crypto.randomUUID()),
     );
+    resetForm();
   };
 
   const handleDelete = (e: React.MouseEvent, id: string) => {

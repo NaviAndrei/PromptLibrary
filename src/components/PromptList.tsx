@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { VariableInjector } from './VariableInjector';
 import { VersionHistory } from './VersionHistory';
-import { FixedSizeList as List } from 'react-window';
 
 interface ListChildData<T = unknown> {
   index: number;
@@ -385,6 +384,7 @@ export function PromptList({
           promptTitle={historyPrompt.title}
           versions={[
             {
+              id: `current-${historyPrompt.id}`,
               promptId: historyPrompt.id,
               body: historyPrompt.body,
               savedAt: historyPrompt.updatedAt,
@@ -395,29 +395,16 @@ export function PromptList({
         />
       )}
 
-      {viewMode === 'list' && prompts.length > 5 ? (
-        <List
-          height={800}
-          width="100%"
-          itemCount={prompts.length}
-          itemSize={280}
-          itemData={prompts}
-          className="prompt-list list virtualized"
-        >
-          {PromptRow}
-        </List>
-      ) : (
-        <div className={`prompt-list ${viewMode}`} id="prompt-list">
-          {prompts.map((_: Prompt, idx: number) => (
-            <PromptRow
-              key={prompts[idx].id}
-              index={idx}
-              style={{ position: 'relative' }}
-              data={prompts}
-            />
-          ))}
-        </div>
-      )}
+      <div className={`prompt-list ${viewMode}`} id="prompt-list">
+        {prompts.map((_: Prompt, idx: number) => (
+          <PromptRow
+            key={prompts[idx].id}
+            index={idx}
+            style={{ position: 'relative' }}
+            data={prompts}
+          />
+        ))}
+      </div>
     </>
   );
 }

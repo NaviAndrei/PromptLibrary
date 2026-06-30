@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Prompt, Workspace } from '../types';
 import { ChevronDown } from 'lucide-react';
+import { toast } from 'sonner';
 import { LLM_MODELS } from '../constants';
 
 interface PromptFormProps {
@@ -79,7 +80,7 @@ export function PromptForm({
 
     // Basic validation
     if (!title.trim() || !body.trim()) {
-      alert('Title and prompt body are required.');
+      toast.error('Title and prompt body are required.');
       return;
     }
 
