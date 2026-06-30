@@ -25,7 +25,6 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
                     const item = window.localStorage.getItem(key);
                     const newValue = item ? JSON.parse(item) : initialValue;
                     setStoredValue(newValue);
-                    console.log(`Storage sync triggered for key: ${key}`, newValue?.length);
                 } catch (err) {
                     console.error('Error during auto-sync:', err);
                 }

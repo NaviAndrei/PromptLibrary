@@ -24,7 +24,6 @@ export function useIndexedDB<T>(storeName: string, initialValue: T[], legacyKey?
                 
                 if (data.length > 0) {
                     setStoredValue(data);
-                    console.log(`[DB] Loaded ${data.length} items from ${storeName}`);
                 } else {
                     // 2. One-Time Migration: Check if there's old data in localStorage.
                     // Use legacyKey when the old localStorage key differs from the storeName
@@ -34,8 +33,6 @@ export function useIndexedDB<T>(storeName: string, initialValue: T[], legacyKey?
                     if (legacyData) {
                         const parsed: T[] = JSON.parse(legacyData);
                         if (Array.isArray(parsed) && parsed.length > 0) {
-                            console.log(`[DB] Migrating ${parsed.length} items from localStorage to IndexedDB...`);
-                            
                             // Batch migrate into IndexedDB
                             for (const item of parsed) {
                                 await dbInstance.put(storeName, item);
