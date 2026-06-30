@@ -21,6 +21,6 @@ export default defineConfig({
       }
     },
     chunkSizeWarningLimit: 1000, // 1MB threshold for library components
-    sourcemap: true // Useful for debugging production issues
+    sourcemap: false // Avoid shipping original source maps to the public GitHub Pages deploy
   }
 })
