@@ -9,6 +9,40 @@ interface DataActionsProps {
     onImport: (imported: Prompt[]) => void;
 }
 
+// Minimum shape an imported record must have to be a usable prompt.
+type ImportedPrompt = Partial<Prompt> & Pick<Prompt, 'id' | 'title' | 'body'>;
+
+// Guard: payload must be an array of objects carrying at least id/title/body strings.
+function isValidPromptArray(data: unknown): data is ImportedPrompt[] {
+    return (
+        Array.isArray(data) &&
+        data.every(
+            (p) =>
+                !!p &&
+                typeof p === 'object' &&
+                typeof (p as Prompt).id === 'string' &&
+                typeof (p as Prompt).title === 'string' &&
+                typeof (p as Prompt).body === 'string',
+        )
+    );
+}
+
+// Coerce a loosely-typed imported record into a complete, render-safe Prompt.
+// Guarantees tags is an array and model is a string so downstream consumers never crash.
+function normalizePrompt(p: ImportedPrompt): Prompt {
+    const nowIso = new Date().toISOString();
+    return {
+        id: p.id,
+        title: p.title,
+        body: p.body,
+        tags: Array.isArray(p.tags) ? p.tags.filter((t): t is string => typeof t === 'string') : [],
+        model: typeof p.model === 'string' && p.model ? p.model : 'Unknown',
+        createdAt: typeof p.createdAt === 'string' ? p.createdAt : nowIso,
+        updatedAt: typeof p.updatedAt === 'string' ? p.updatedAt : nowIso,
+        workspaceId: typeof p.workspaceId === 'string' ? p.workspaceId : undefined,
+    };
+}
+
 export function DataActions({ prompts, onImport }: DataActionsProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [showSyncModal, setShowSyncModal] = useState(false);
@@ -17,6 +51,36 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
     const [githubToken, setGithubToken] = useLocalStorage('github_token', '');
     const [gistId, setGistId] = useLocalStorage('github_gist_id', '');
     const [isSyncing, setIsSyncing] = useState(false);
+
+    // Non-destructive import: merge by id (default) or replace, never a silent wipe.
+    const applyImport = (incoming: Prompt[]) => {
+        if (prompts.length === 0) {
+            onImport(incoming);
+            toast.success(`Imported ${incoming.length} prompts.`);
+            return;
+        }
+        const merge = window.confirm(
+            `You have ${prompts.length} existing prompts.\n\n` +
+                `OK = Merge (imported entries overwrite matching IDs)\n` +
+                `Cancel = Replace everything with the ${incoming.length} imported prompts`,
+        );
+        if (merge) {
+            const byId = new Map(prompts.map((p) => [p.id, p]));
+            incoming.forEach((p) => byId.set(p.id, p));
+            const merged = Array.from(byId.values());
+            onImport(merged);
+            toast.success(`Merged ${incoming.length} prompts (${merged.length} total).`);
+        } else {
+            onImport(incoming);
+            toast.success(`Replaced library with ${incoming.length} imported prompts.`);
+        }
+    };
+
+    const forgetToken = () => {
+        setGithubToken('');
+        setGistId('');
+        toast.success('GitHub token and Gist ID cleared from this browser.');
+    };
 
     const handleExport = () => {
         const dataStr = JSON.stringify(prompts, null, 2);
@@ -41,14 +105,12 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
             try {
                 const result = event.target?.result as string;
                 const parsed = JSON.parse(result);
-                
-                if (Array.isArray(parsed) && parsed.every(p => p.title && p.body && p.id)) {
-                    onImport(parsed);
-                    // Dispatch custom event for storage sync
+
+                if (isValidPromptArray(parsed)) {
+                    applyImport(parsed.map(normalizePrompt));
                     window.dispatchEvent(new Event('storage-sync'));
-                    toast.success(`${parsed.length} prompts imported successfully!`);
                 } else {
-                    toast.error('Invalid JSON structure. Needs to be Prompt[].');
+                    toast.error('Invalid backup: expected an array of prompts with id, title, and body.');
                 }
             } catch (err) {
                 console.error('JSON parsing error:', err);
@@ -122,12 +184,11 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
             if (!fileData) throw new Error('Gist does not contain the expected file');
             
             const parsed = JSON.parse(fileData.content);
-            if (Array.isArray(parsed)) {
-                onImport(parsed);
+            if (isValidPromptArray(parsed)) {
+                applyImport(parsed.map(normalizePrompt));
                 window.dispatchEvent(new Event('storage-sync'));
-                toast.success(`Loaded ${parsed.length} prompts from Cloud!`);
             } else {
-                console.warn('Gist data is not an array:', parsed);
+                toast.error('Cloud backup is not a valid prompt array.');
             }
         } catch (error) {
             console.error(error);
@@ -188,13 +249,23 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
                                     placeholder="e.g., abcd1234efgh5678"
                                 />
                             </div>
-                            <div className="modal-actions" style={{justifyContent: 'flex-end'}}>
-                                <button className="btn-secondary" onClick={syncFromGist} disabled={isSyncing}>
-                                    Pull (Load from Cloud)
+                            <div className="modal-actions" style={{ justifyContent: 'space-between' }}>
+                                <button
+                                    className="btn-secondary"
+                                    onClick={forgetToken}
+                                    disabled={isSyncing || (!githubToken && !gistId)}
+                                    title="Clear the saved token and Gist ID from this browser"
+                                >
+                                    Forget Token
                                 </button>
-                                <button className="btn-primary" onClick={syncToGist} disabled={isSyncing}>
-                                    Push (Save to Cloud)
-                                </button>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <button className="btn-secondary" onClick={syncFromGist} disabled={isSyncing}>
+                                        Pull (Load from Cloud)
+                                    </button>
+                                    <button className="btn-primary" onClick={syncToGist} disabled={isSyncing}>
+                                        Push (Save to Cloud)
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
