@@ -17,6 +17,22 @@ import { usePromptFilters } from './hooks/usePromptFilters';
 import { useIndexedDB } from './hooks/useIndexedDB';
 import { LLM_MODELS } from './constants';
 
+// Format a Date as the yyyy-mm-dd string a <input type="date"> expects, in local time.
+const toDateInputValue = (d: Date | null): string => {
+  if (!d) return '';
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
+// Parse a yyyy-mm-dd value into a local-midnight Date (avoids UTC off-by-one).
+const parseDateInput = (value: string): Date | null => {
+  if (!value) return null;
+  const [y, m, d] = value.split('-').map(Number);
+  return new Date(y, m - 1, d);
+};
+
 function App() {
   const [prompts, setPrompts] = useIndexedDB<Prompt>('prompts', []);
   const [workspaces, setWorkspaces] = useIndexedDB<Workspace>('workspaces', []);
@@ -52,7 +68,7 @@ function App() {
   const allTags = useMemo(() => {
     const counts: Record<string, number> = {};
     prompts.forEach((p) =>
-      p.tags.forEach((t) => {
+      (p.tags ?? []).forEach((t) => {
         counts[t] = (counts[t] || 0) + 1;
       }),
     );
@@ -60,7 +76,7 @@ function App() {
   }, [prompts]);
 
   const allModels = useMemo(() => {
-    const models = new Set(prompts.map((p) => p.model));
+    const models = new Set(prompts.map((p) => p.model).filter(Boolean));
     return Array.from(models).sort();
   }, [prompts]);
 
@@ -78,6 +94,7 @@ function App() {
     const now = new Date().toISOString();
     if (editingPrompt) {
       const snapshot: PromptVersion = {
+        id: crypto.randomUUID(),
         promptId: editingPrompt.id,
         body: editingPrompt.body,
         savedAt: editingPrompt.updatedAt ?? now,
@@ -103,8 +120,9 @@ function App() {
   };
 
   const handleImportPrompts = (imported: Prompt[]) => {
+    // Validation, normalization, and merge/replace messaging live in DataActions;
+    // here we just persist the final, already-clean array.
     setPrompts(imported);
-    toast.success(`Successfully imported ${imported.length} prompts!`);
   };
 
   const handleEditPrompt = (prompt: Prompt) => {
@@ -198,6 +216,8 @@ function App() {
           <button
             className="btn-icon"
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
           >
             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
           </button>
@@ -278,10 +298,11 @@ function App() {
                 <input
                   type="date"
                   className="minimal-date"
+                  value={toDateInputValue(dateRange.start)}
                   onChange={(e) =>
                     setDateRange((prev) => ({
                       ...prev,
-                      start: e.target.value ? new Date(e.target.value) : null,
+                      start: parseDateInput(e.target.value),
                     }))
                   }
                 />
@@ -292,10 +313,11 @@ function App() {
                 <input
                   type="date"
                   className="minimal-date"
+                  value={toDateInputValue(dateRange.end)}
                   onChange={(e) =>
                     setDateRange((prev) => ({
                       ...prev,
-                      end: e.target.value ? new Date(e.target.value) : null,
+                      end: parseDateInput(e.target.value),
                     }))
                   }
                 />
