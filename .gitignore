@@ -51,3 +51,5 @@ dist-ssr/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+git_workflow_guide.md
