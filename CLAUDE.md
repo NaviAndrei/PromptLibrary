@@ -21,3 +21,6 @@ React 18 + TypeScript + Vite + CSS Modules (React 19 in package.json dependencie
 - fix(responsive): [component]
 - feat: [description]
 - refactor: [scope]
+
+## Known Non-Issues
+- `.agent/workflows/` is inactive legacy tooling from a different AI assistant (Windsurf/Cascade) — Claude Code does not read this directory. Safe to ignore or remove.

@@ -176,12 +176,6 @@ export function TemplateManager({ onAddAsPrompt }: TemplateManagerProps) {
             <div
               className="modal-content template-manager-modal"
               onClick={(e) => e.stopPropagation()}
-              style={{
-                maxWidth: '640px',
-                width: '92vw',
-                maxHeight: '85vh',
-                overflowY: 'auto',
-              }}
             >
               <div className="modal-header">
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>
@@ -297,12 +291,14 @@ export function TemplateManager({ onAddAsPrompt }: TemplateManagerProps) {
               >
                 {t.name}
               </span>
-              <Trash2
-                size={12}
-                className="workspace-delete-btn"
-                style={{ opacity: 0.6 }}
+              <button
+                type="button"
+                className="btn-icon workspace-delete-btn"
                 onClick={(e) => handleDelete(e, t.id)}
-              />
+                title="Delete template"
+              >
+                <Trash2 size={12} />
+              </button>
             </div>
             <span
               style={{

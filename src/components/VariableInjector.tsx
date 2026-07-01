@@ -173,7 +173,9 @@ export function VariableInjector({ body }: VariableInjectorProps) {
                         {presets.map(p => (
                             <div key={p.id} className="preset-chip" onClick={() => handleApplyPreset(p)}>
                                 <span>{p.name}</span>
-                                <Trash2 size={10} className="delete-icon" onClick={(e) => handleDeletePreset(e, p.id)} />
+                                <button className="btn-icon delete-icon" onClick={(e) => handleDeletePreset(e, p.id)} title="Delete preset">
+                                    <Trash2 size={10} />
+                                </button>
                             </div>
                         ))}
                     </div>

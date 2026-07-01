@@ -96,7 +96,7 @@ class SearchService {
         const results: SearchResult[] = this.index.search(query, {
             enrich: false,
             limit: 100,
-            suggest: true
+            suggest: false
         });
 
         // Flatten the multi-field result format: [{ field: 'title', result: [...] }, ...]
