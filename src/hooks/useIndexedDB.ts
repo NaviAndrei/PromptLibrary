@@ -15,6 +15,25 @@ import { toast } from 'sonner';
 export function useIndexedDB<T>(storeName: string, initialValue: T[], legacyKey?: string) {
     const [storedValue, setStoredValue] = useState<T[]>(initialValue);
 
+    // Re-read from IndexedDB whenever another useIndexedDB/consumer for this store
+    // writes and dispatches 'storage-sync', so two consumers of the same store stay
+    // in agreement. Safe from feedback loops: this only reads (getAll + setState),
+    // it never calls setValue/dispatchEvent itself, so it can't re-trigger the event
+    // it's listening for — mirrors useLocalStorage's own 'storage-sync' listener.
+    useEffect(() => {
+        const handleStorageSync = async () => {
+            try {
+                const data = await dbInstance.getAll<T>(storeName);
+                setStoredValue(data);
+            } catch (error) {
+                console.error(`[DB] Error re-syncing ${storeName}:`, error);
+            }
+        };
+
+        window.addEventListener('storage-sync', handleStorageSync);
+        return () => window.removeEventListener('storage-sync', handleStorageSync);
+    }, [storeName]);
+
     // Load data from IndexedDB on component mount
     useEffect(() => {
         const loadAndMigrate = async () => {
