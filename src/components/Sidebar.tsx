@@ -33,6 +33,14 @@ export function Sidebar({ tags, selectedTag, onSelectTag }: SidebarProps) {
           <li
             className={selectedTag === null ? 'active' : ''}
             onClick={() => onSelectTag(null)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onSelectTag(null);
+              }
+            }}
           >
             All
           </li>
@@ -41,6 +49,14 @@ export function Sidebar({ tags, selectedTag, onSelectTag }: SidebarProps) {
               key={tag}
               className={selectedTag === tag ? 'active' : ''}
               onClick={() => onSelectTag(tag === selectedTag ? null : tag)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectTag(tag === selectedTag ? null : tag);
+                }
+              }}
             >
               <span className="tag-name">#{tag}</span>
               <span className="tag-count">{count}</span>

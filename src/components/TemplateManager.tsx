@@ -291,12 +291,14 @@ export function TemplateManager({ onAddAsPrompt }: TemplateManagerProps) {
               >
                 {t.name}
               </span>
-              <Trash2
-                size={12}
-                className="workspace-delete-btn"
-                style={{ opacity: 0.6 }}
+              <button
+                type="button"
+                className="btn-icon workspace-delete-btn"
                 onClick={(e) => handleDelete(e, t.id)}
-              />
+                title="Delete template"
+              >
+                <Trash2 size={12} />
+              </button>
             </div>
             <span
               style={{
