@@ -102,8 +102,8 @@ export function VersionHistory({ promptTitle, versions, onClose }: VersionHistor
                     <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <Clock size={18} /> Version History
                     </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{promptTitle}</span>
+                    <div className="version-history-header-meta">
+                        <span className="version-history-title-text" title={promptTitle}>{promptTitle}</span>
                         <button className="btn-icon" onClick={onClose}><X size={18} /></button>
                     </div>
                 </div>

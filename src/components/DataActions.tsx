@@ -249,7 +249,7 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
                                     placeholder="e.g., abcd1234efgh5678"
                                 />
                             </div>
-                            <div className="modal-actions" style={{ justifyContent: 'space-between' }}>
+                            <div className="modal-actions modal-actions-split">
                                 <button
                                     className="btn-secondary"
                                     onClick={forgetToken}
@@ -258,7 +258,7 @@ export function DataActions({ prompts, onImport }: DataActionsProps) {
                                 >
                                     Forget Token
                                 </button>
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <div className="modal-actions-group">
                                     <button className="btn-secondary" onClick={syncFromGist} disabled={isSyncing}>
                                         Pull (Load from Cloud)
                                     </button>

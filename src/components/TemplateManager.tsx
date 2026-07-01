@@ -176,12 +176,6 @@ export function TemplateManager({ onAddAsPrompt }: TemplateManagerProps) {
             <div
               className="modal-content template-manager-modal"
               onClick={(e) => e.stopPropagation()}
-              style={{
-                maxWidth: '640px',
-                width: '92vw',
-                maxHeight: '85vh',
-                overflowY: 'auto',
-              }}
             >
               <div className="modal-header">
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>
