@@ -12,9 +12,10 @@ import { TemplateManager } from './components/TemplateManager';
 import { StorageUsage } from './components/StorageUsage';
 import { CleanupAssistant } from './components/CleanupAssistant';
 import { Toaster, toast } from 'sonner';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, Menu, X } from 'lucide-react';
 import { usePromptFilters } from './hooks/usePromptFilters';
 import { useIndexedDB } from './hooks/useIndexedDB';
+import { useSidebarDrawer } from './hooks/useSidebarDrawer';
 import { LLM_MODELS } from './constants';
 
 // Format a Date as the yyyy-mm-dd string a <input type="date"> expects, in local time.
@@ -51,6 +52,14 @@ function App() {
     'view-mode',
     'grid',
   );
+
+  const {
+    isOpen: isSidebarOpen,
+    close: closeSidebar,
+    toggle: toggleSidebar,
+    drawerRef,
+    toggleButtonRef,
+  } = useSidebarDrawer();
 
   const [editingPrompt, setEditingPrompt] = useState<Prompt | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
@@ -214,6 +223,17 @@ function App() {
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <button
+            className="btn-icon hamburger-btn"
+            ref={toggleButtonRef}
+            onClick={toggleSidebar}
+            aria-label={isSidebarOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isSidebarOpen}
+            aria-controls="app-sidebar"
+            title={isSidebarOpen ? 'Close menu' : 'Open menu'}
+          >
+            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+          <button
             className="btn-icon"
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
             aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
@@ -225,8 +245,23 @@ function App() {
         </div>
       </header>
 
+      {isSidebarOpen && (
+        <div
+          className="sidebar-backdrop"
+          onClick={closeSidebar}
+          aria-hidden="true"
+        />
+      )}
+
       <div className="app-layout">
-        <aside className="sidebar">
+        <aside
+          className={`sidebar${isSidebarOpen ? ' sidebar-open' : ''}`}
+          id="app-sidebar"
+          ref={drawerRef}
+          aria-label="Sidebar navigation"
+          role={isSidebarOpen ? 'dialog' : undefined}
+          aria-modal={isSidebarOpen ? true : undefined}
+        >
           <div className="sidebar-scroll">
             <WorkspaceManager
               workspaces={workspaces}
