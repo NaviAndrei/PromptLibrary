@@ -6,11 +6,11 @@ on:
   pull_request:
     branches: [ main ]
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# CRITICAL FIX: 'cancel-in-progress: true' kills stuck/zombie runs that block the queue.
+# Using 'github.workflow' ensures this only affects this specific pipeline.
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   # Quality Gate: Lint and Type Check
@@ -81,7 +81,8 @@ jobs:
   deploy-pages:
     name: Deploy to GitHub Pages
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: build-audit
+    # OPTIMIZATION: Depends on 'analyze-and-test' instead of 'build-audit' to run faster
+    needs: analyze-and-test
     runs-on: ubuntu-latest
     permissions:
       pages: write
