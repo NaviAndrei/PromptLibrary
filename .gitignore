@@ -25,7 +25,6 @@ dist-ssr
 .agent
 .specstory/
 .vscode/
-.github/
 git_workflow_guide.md
 .claude/
 docs/
