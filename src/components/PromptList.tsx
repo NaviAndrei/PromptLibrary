@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { VariableInjector } from './VariableInjector';
 import { VersionHistory } from './VersionHistory';
+import { ExportModal } from './ExportModal';
 
 interface ListChildData<T = unknown> {
   index: number;
@@ -54,8 +55,7 @@ interface PromptCardActionsProps {
   prompt: Prompt;
   onEdit: (p: Prompt) => void;
   onCopy: (body: string) => void;
-  onExportMD: (p: Prompt) => void;
-  onExportJSON: (p: Prompt) => void;
+  onExport: (p: Prompt) => void;
   onViewHistory: (id: string) => void;
   onDelete: (id: string) => void;
 }
@@ -64,8 +64,7 @@ function PromptCardActions({
   prompt,
   onEdit,
   onCopy,
-  onExportMD,
-  onExportJSON,
+  onExport,
   onViewHistory,
   onDelete,
 }: PromptCardActionsProps) {
@@ -82,18 +81,11 @@ function PromptCardActions({
         <Copy size={16} />
       </button>
       <button
-        onClick={() => onExportMD(prompt)}
+        onClick={() => onExport(prompt)}
         className="btn-icon"
-        title="Export as Markdown"
+        title="Export"
       >
         <Download size={16} />
-      </button>
-      <button
-        onClick={() => onExportJSON(prompt)}
-        className="btn-icon"
-        title="Export as JSON"
-      >
-        <Download size={16} style={{ color: 'var(--primary-color)' }} />
       </button>
       <button
         onClick={() => onViewHistory(prompt.id)}
@@ -204,6 +196,7 @@ export function PromptList({
 }: PromptListProps) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [historyPromptId, setHistoryPromptId] = useState<string | null>(null);
+  const [exportPrompt, setExportPrompt] = useState<Prompt | null>(null);
 
   // O(1) workspace lookup optimization using Object.fromEntries
   const workspaceMap = useMemo(
@@ -316,8 +309,7 @@ export function PromptList({
               prompt={prompt}
               onEdit={onEdit}
               onCopy={handleCopy}
-              onExportMD={handleExportMD}
-              onExportJSON={handleExportJSON}
+              onExport={setExportPrompt}
               onViewHistory={setHistoryPromptId}
               onDelete={onDelete}
             />
@@ -392,6 +384,15 @@ export function PromptList({
             ...getVersions(historyPrompt.id),
           ]}
           onClose={() => setHistoryPromptId(null)}
+        />
+      )}
+
+      {exportPrompt && (
+        <ExportModal
+          prompt={exportPrompt}
+          onClose={() => setExportPrompt(null)}
+          onExportMD={handleExportMD}
+          onExportJSON={handleExportJSON}
         />
       )}
 
