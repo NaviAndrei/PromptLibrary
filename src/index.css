@@ -316,12 +316,6 @@ body {
   font-size: 1.1rem;
   line-height: 1.4;
   margin-bottom: 0.5rem;
-  height: 3rem; /* Fixed height for title to align cards */
-  display: -webkit-box;
-  line-clamp: 2;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .prompt-actions {
@@ -1072,10 +1066,24 @@ button {
   margin-bottom: 1.5rem;
 }
 
+.prompt-list.grid .prompt-header h4 {
+  height: 3rem;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .prompt-list.list {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+.prompt-list.list .prompt-card {
+  box-shadow: var(--shadow-sm);
+  border-left: 3px solid var(--primary-color);
 }
 
 .prompt-header {
