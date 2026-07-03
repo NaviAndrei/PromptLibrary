@@ -6,8 +6,6 @@ on:
   pull_request:
     branches: [ main ]
 
-# CRITICAL FIX: 'cancel-in-progress: true' kills stuck/zombie runs that block the queue.
-# Using 'github.workflow' ensures this only affects this specific pipeline.
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -70,51 +68,3 @@ jobs:
 
       - name: Build Application
         run: npm run build
-
-      - name: Build Artifact Audit
-        run: |
-          echo "### Build Statistics" >> $GITHUB_STEP_SUMMARY
-          echo "Total build size: $(du -sh dist/ | cut -f1)" >> $GITHUB_STEP_SUMMARY
-          echo "JS Chunks: $(ls -l dist/assets/*.js | wc -l)" >> $GITHUB_STEP_SUMMARY
-
-  # Deploy to GitHub Pages
-  deploy-pages:
-    name: Deploy to GitHub Pages
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    # OPTIMIZATION: Depends on 'analyze-and-test' instead of 'build-audit' to run faster
-    needs: analyze-and-test
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-      contents: read
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install Dependencies
-        run: npm ci --legacy-peer-deps
-
-      - name: Build Application
-        run: npm run build
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./dist
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
