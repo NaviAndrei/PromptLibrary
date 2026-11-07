@@ -685,6 +685,10 @@ button {
   min-height: 44px;
 }
 
+.sidebar-collapse-btn {
+  display: none;
+}
+
 /* List Statistics */
 .stats-bar {
   display: flex;
@@ -989,6 +993,14 @@ button {
     display: none;
   }
 
+  .sidebar-collapse-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
   .sidebar-backdrop {
     display: none;
   }
@@ -1007,6 +1019,10 @@ button {
     transform: none;
     transition: all 0.3s ease;
     z-index: auto;
+  }
+
+  .sidebar.sidebar-collapsed {
+    display: none;
   }
 }
 
