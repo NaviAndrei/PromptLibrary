@@ -12,7 +12,7 @@ import { TemplateManager } from './components/TemplateManager';
 import { StorageUsage } from './components/StorageUsage';
 import { CleanupAssistant } from './components/CleanupAssistant';
 import { Toaster, toast } from 'sonner';
-import { Moon, Sun, Menu, X } from 'lucide-react';
+import { Moon, Sun, Menu, X, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { usePromptFilters } from './hooks/usePromptFilters';
 import { useIndexedDB } from './hooks/useIndexedDB';
 import { useSidebarDrawer } from './hooks/useSidebarDrawer';
@@ -51,6 +51,10 @@ function App() {
   const [viewMode, setViewMode] = useLocalStorage<'list' | 'grid'>(
     'view-mode',
     'grid',
+  );
+  const [sidebarCollapsed, setSidebarCollapsed] = useLocalStorage<boolean>(
+    'sidebar-collapsed',
+    false,
   );
 
   const {
@@ -234,6 +238,16 @@ function App() {
             {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
           <button
+            className="btn-icon sidebar-collapse-btn"
+            onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+            aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-expanded={!sidebarCollapsed}
+            aria-controls="app-sidebar"
+            title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {sidebarCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
+          </button>
+          <button
             className="btn-icon"
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
             aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
@@ -255,7 +269,7 @@ function App() {
 
       <div className="app-layout">
         <aside
-          className={`sidebar${isSidebarOpen ? ' sidebar-open' : ''}`}
+          className={`sidebar${isSidebarOpen ? ' sidebar-open' : ''}${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}
           id="app-sidebar"
           ref={drawerRef}
           aria-label="Sidebar navigation"
